@@ -1,14 +1,3 @@
 [default]
-port = 5555
-[development]
-server = 'devserver.com'
-[production]
-server = 'prodserver.com'
-[staging]
-server = 'stagserver.com'
-[testing]
-server = 'testserver.com'
-[mycustomenv]
-server = 'customserver.com'
-[global]
-username = 'admin'
+db_uri = 'postgres:blah@localhost:5432/sharpener'
+db_api = 'postgresql+psycopg2://'

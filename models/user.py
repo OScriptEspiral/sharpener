@@ -1,14 +1,14 @@
 from .base import Base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Enum, Boolean
 
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    fullname = Column(String)
+    email = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
     nickname = Column(String)
+    is_teacher = Column(Boolean, default=False)
+    github_token = Column(String, nullable=False)
 
     def __repr__(self):
-        return "<User(name='%s', fullname='%s', nickname='%s')>" % (
-            self.name, self.fullname, self.nickname)
+        return "<User(name='%s', email='%s')>" % (self.name, self.email)

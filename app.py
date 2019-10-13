@@ -1,7 +1,7 @@
 from dynaconf import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import User, Base
+from models import User, Exercise, Base
 
 
 
@@ -10,8 +10,13 @@ def database_setup(db_uri):
     sess = sessionmaker(bind=engine)
     return sess()
 
-session = database_setup(settings.PORT)
-ed_user = User(name='ed', fullname='Ed Jones', nickname='edsnickname')
-our_user = session.query(User).filter_by(name='ed').first() 
+session = database_setup(f"{settings.DB_API}{settings.DB_URI}")
+ed = session.query(User).filter_by(name='ed').first()
+our_user = Exercise(name="Hello World",
+                    creator='Ed Jones',
+                    language='Rust',
+                    description="First program",
+                    files="uri://")
 
-session.add(ed_user)
+session.add(our_user)
+session.commit()
