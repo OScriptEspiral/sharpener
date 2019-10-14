@@ -1,7 +1,7 @@
 from dynaconf import settings
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from models import User, Base, Exercise
+from models import User, Base, Exercise, Artifact
 
 def create_db(db_uri):
     engine = create_engine(db_uri, echo=True)

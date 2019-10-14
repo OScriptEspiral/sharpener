@@ -1,3 +1,5 @@
 sqlalchemy
 psycopg2-binary
 dynaconf
+google-cloud-storage
+git-python

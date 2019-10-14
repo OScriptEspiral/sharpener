@@ -11,5 +11,5 @@ class Artifact(Base):
     readme = Column(String, nullable=False)
     solution = Column(String, nullable=False)
     starting_point = Column(String, nullable=False)
-    tests = Column(String, nullable=False)
-    hints = Column(String, nullable=True)
+    test = Column(String, nullable=False)
+    hint = Column(String, nullable=True)

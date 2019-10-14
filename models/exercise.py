@@ -9,11 +9,10 @@ languages = ENUM('Rust', name='languages')
 class Exercise(Base):
     __tablename__ = 'exercises'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    creator = Column(String, ForeignKey('users.email'), nullable=False)
+    name = Column(String, primary_key=True)
+    language = Column(languages,primary_key=True)
+    creator = Column(ForeignKey('users.email'), nullable=False)
     description = Column(Text, nullable=False)
     topics = Column(ARRAY(String))
     difficulty = Column(Integer)
-    language = Column(languages, nullable=False)
-    artifacts = Column(ForeignKey('artifact.id'), nullable=False)
+    artifacts = Column(ForeignKey('artifacts.id'), nullable=False)
