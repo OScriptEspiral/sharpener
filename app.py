@@ -1,9 +1,8 @@
 from dynaconf import settings
+from google.cloud import storage
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import User, Exercise, Base
 from connectors import exercism
-
 
 
 def database_setup(db_uri):
@@ -11,5 +10,7 @@ def database_setup(db_uri):
     sess = sessionmaker(bind=engine)
     return sess()
 
+
 session = database_setup(f"{settings.DB_API}{settings.DB_URI}")
-exercism.populate_rust(session)
+storage_client = storage.Client()
+exercism.populate_rust(session, storage_client, settings.BUCKET_EXERCISES)

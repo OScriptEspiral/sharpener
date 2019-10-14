@@ -1,7 +1,5 @@
 from .base import Base
-from sqlalchemy import ForeignKey, Column, Integer, String, Text, ARRAY
-from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 
 
 class Artifact(Base):
