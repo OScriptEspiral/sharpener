@@ -24,7 +24,7 @@ def upload_folder(exercise_path, starting_path, blob_destination, bucket):
     for dirpath, dirname, filenames in walk(exercise_path):
         rel_dir = dirpath.split(starting_path)[1]
         for file in filenames:
-            blob = bucket.blob(f"{blob_destination}/{rel_dir}/{file}")
+            blob = bucket.blob(f"{blob_destination}{rel_dir}/{file}")
             blob.upload_from_filename(f"{dirpath}/{file}")
 
 

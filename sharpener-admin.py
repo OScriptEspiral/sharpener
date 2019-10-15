@@ -17,27 +17,27 @@ from models import Base
 
 
 def create_db(db_uri):
-    engine = create_engine(db_uri, echo=True)
+    engine = create_engine(db_uri, client_encoding="utf8",echo=True)
     return Base.metadata.create_all(engine)
 
 
 def database_setup(db_uri):
-    engine = create_engine(db_uri, echo=True)
+    engine = create_engine(db_uri, client_encoding="utf8", echo=True)
     sess = orm.sessionmaker(bind=engine)
     return sess()
 
 
 if __name__ == "__main__":
-    args = docopt(__doc__)
-    if args["create_schema"]:
+    ARGS = docopt(__doc__)
+    if ARGS["create_schema"]:
         create_db(settings.DB_API+settings.DB_URI)
 
-    if args["populate"]:
-        session = database_setup(f"{settings.DB_API}{settings.DB_URI}")
-        storage_client = storage.Client()
-        exercism.populate_rust(session,
-                               storage_client,
+    if ARGS["populate"]:
+        SESSION = database_setup(f"{settings.DB_API}{settings.DB_URI}")
+        STORAGE_CLIENT = storage.Client()
+        exercism.populate_rust(SESSION,
+                               STORAGE_CLIENT,
                                settings.BUCKET_EXERCISES)
-    if args["start_server"]:
+    if ARGS["start_server"]:
         app = Flask(__name__)
         app.run()
