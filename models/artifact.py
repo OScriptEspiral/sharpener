@@ -1,7 +1,6 @@
 from .base import Base
-from sqlalchemy import ForeignKey, Column, Integer, String, Text, ARRAY
-from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 
 
 class Artifact(Base):
@@ -11,5 +10,8 @@ class Artifact(Base):
     readme = Column(String, nullable=False)
     solution = Column(String, nullable=False)
     starting_point = Column(String, nullable=False)
-    tests = Column(String, nullable=False)
-    hints = Column(String, nullable=True)
+    test = Column(String, nullable=False)
+    hint = Column(String, nullable=True)
+    exercise = relationship("Exercise",
+                            back_populates="artifact",
+                            uselist=False)
