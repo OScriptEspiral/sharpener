@@ -26,5 +26,6 @@ class RustMapper(object):
 
     def get_metadata(exercise_path):
         config = f"{exercise_path}/config.json"
-        with json.load(config) as metadata:
+        with open(config, 'r') as file:
+            metadata = json.load(file)
             return metadata['exercises']

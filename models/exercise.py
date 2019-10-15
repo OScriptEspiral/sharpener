@@ -1,4 +1,5 @@
 from .base import Base
+from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, Column, Integer, String, Text, ARRAY, Enum
 
 languages = ['rust']
@@ -14,3 +15,6 @@ class Exercise(Base):
     topics = Column(ARRAY(String))
     difficulty = Column(Integer)
     artifact_id = Column(ForeignKey('artifacts.id'))
+    artifact = relationship("Artifact",
+                            back_populates="exercise",
+                            uselist=False)

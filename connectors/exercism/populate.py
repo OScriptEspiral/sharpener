@@ -14,6 +14,7 @@ def get_or_create_default_user(session):
                              is_teacher=True,
                              github_token="")
         session.add(exercism_user)
+        session.flush()
         return exercism_user
     return default_user
 
@@ -26,7 +27,8 @@ def upload_folder(exercise_path, starting_path, blob_destination, bucket):
             blob.upload_from_filename(f"{dirpath}/{file}")
 
 
-def fetch_exercise(name, starting_path, blob_prefix, mapper, bucket, user):
+def fetch_exercise(name, starting_path, clone_dir,
+                   blob_prefix, mapper, bucket, user):
     print(f"Fetching exercise:{name}")
     exercise_path = f"{starting_path}/{name}"
     upload_folder(exercise_path,
@@ -38,16 +40,24 @@ def fetch_exercise(name, starting_path, blob_prefix, mapper, bucket, user):
     mappings = mapper.get_files_mappings(blob_prefix,
                                          name,
                                          has_hint=has_hint)
+    metadata = mapper.get_metadata(clone_dir)
+    topics, difficulty = next(iter([(ex["topics"], ex["difficulty"])
+                                    for ex in metadata if ex["slug"] == name]),
+                              (None, None))
     exercise = Exercise(name=name,
                         language=mapper.language,
                         description=mapper.pluck_readme(exercise_path),
+                        topics=topics,
+                        difficulty=difficulty,
                         creator=user.email)
 
     files = Artifact(readme=mappings["readme"],
                      solution=mappings["solution"],
                      starting_point=mappings["starting_point"],
                      test=mappings["test"],
-                     hint=mappings["hint"])
+                     hint=mappings["hint"],
+                     exercise=exercise)
+
     return (exercise, files)
 
 
@@ -63,7 +73,7 @@ def populate_exercises(mapper):
         exercism_user = get_or_create_default_user(session)
 
         exercises, files = zip(*[
-            fetch_exercise(name, starting_path, blob_prefix,
+            fetch_exercise(name, starting_path, clone_dir, blob_prefix,
                            mapper, bucket, exercism_user)
             for name in all_exercises
         ])

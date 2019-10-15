@@ -1,4 +1,5 @@
 from .base import Base
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String
 
 
@@ -11,3 +12,6 @@ class Artifact(Base):
     starting_point = Column(String, nullable=False)
     test = Column(String, nullable=False)
     hint = Column(String, nullable=True)
+    exercise = relationship("Exercise",
+                            back_populates="artifact",
+                            uselist=False)
