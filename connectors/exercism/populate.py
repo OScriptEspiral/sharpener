@@ -26,6 +26,31 @@ def upload_folder(exercise_path, starting_path, blob_destination, bucket):
             blob.upload_from_filename(f"{dirpath}/{file}")
 
 
+def fetch_exercise(name, starting_path, blob_prefix, mapper, bucket, user):
+    print(f"Fetching exercise:{name}")
+    exercise_path = f"{starting_path}/{name}"
+    upload_folder(exercise_path,
+                  starting_path,
+                  mapper.language,
+                  bucket)
+
+    has_hint = mapper.hint_exists(exercise_path)
+    mappings = mapper.get_files_mappings(blob_prefix,
+                                         name,
+                                         has_hint=has_hint)
+    exercise = Exercise(name=name,
+                        language=mapper.language,
+                        description=mapper.pluck_readme(exercise_path),
+                        creator=user.email)
+
+    files = Artifact(readme=mappings["readme"],
+                     solution=mappings["solution"],
+                     starting_point=mappings["starting_point"],
+                     test=mappings["test"],
+                     hint=mappings["hint"])
+    return (exercise, files)
+
+
 def populate_exercises(mapper):
     def populate_language(session, storage_client, bucket_name):
         clone_dir = f"/tmp/{uuid1()}"
@@ -37,33 +62,18 @@ def populate_exercises(mapper):
         all_exercises = listdir(f"{starting_path}")
         exercism_user = get_or_create_default_user(session)
 
-        for name in all_exercises[0:3]:
-            print(f"Fetching exercise:{name}")
-            exercise_path = f"{starting_path}/{name}"
-            upload_folder(exercise_path,
-                          starting_path,
-                          mapper.language,
-                          bucket)
+        exercises, files = zip(*[
+            fetch_exercise(name, starting_path, blob_prefix,
+                           mapper, bucket, exercism_user)
+            for name in all_exercises
+        ])
 
-            has_hint = mapper.hint_exists(exercise_path)
-            mappings = mapper.get_files_mappings(blob_prefix,
-                                                 name,
-                                                 has_hint=has_hint)
-            exercise = Exercise(name=name,
-                                language=mapper.language,
-                                description=mapper.pluck_readme(exercise_path))
-
-            files = Artifact(readme=mappings["readme"],
-                             solution=mappings["solution"],
-                             starting_point=mappings["starting_point"],
-                             test=mappings["test"],
-                             hint=mappings["hint"])
-
-            session.add(files)
-            session.add(exercise)
-            exercise.artifact_id = files.id
-            exercise.creator = exercism_user.email
-
+        session.add_all(files)
+        session.commit()
+        session.expire_all()
+        for (exercise, file_) in zip(exercises, files):
+            exercise.artifact_id = file_.id
+        session.add_all(exercises)
         session.commit()
 
     return populate_language
