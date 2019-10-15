@@ -4,13 +4,14 @@ sharpener-admin.
 Usage:
   sharpener-admin create_schema
   sharpener-admin populate
+  sharpener-admin start_server
 """
 
+from flask import Flask
 from docopt import docopt
 from dynaconf import settings
 from google.cloud import storage
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, orm
 from connectors import exercism
 from models import Base
 
@@ -22,7 +23,7 @@ def create_db(db_uri):
 
 def database_setup(db_uri):
     engine = create_engine(db_uri, echo=True)
-    sess = sessionmaker(bind=engine)
+    sess = orm.sessionmaker(bind=engine)
     return sess()
 
 
@@ -37,3 +38,6 @@ if __name__ == "__main__":
         exercism.populate_rust(session,
                                storage_client,
                                settings.BUCKET_EXERCISES)
+    if args["start_server"]:
+        app = Flask(__name__)
+        app.run()

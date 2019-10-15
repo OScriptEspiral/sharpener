@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from git import Repo
 from os import listdir, walk
 from models import User, Exercise, Artifact
@@ -29,7 +30,7 @@ def upload_folder(exercise_path, starting_path, blob_destination, bucket):
 
 def fetch_exercise(name, starting_path, clone_dir,
                    blob_prefix, mapper, bucket, user):
-    print(f"Fetching exercise:{name}")
+    tqdm.write(f"Fetching exercise:{name}")
     exercise_path = f"{starting_path}/{name}"
     upload_folder(exercise_path,
                   starting_path,
@@ -75,7 +76,7 @@ def populate_exercises(mapper):
         exercises, files = zip(*[
             fetch_exercise(name, starting_path, clone_dir, blob_prefix,
                            mapper, bucket, exercism_user)
-            for name in all_exercises
+            for name in tqdm(all_exercises, unit='exercise')
         ])
 
         session.add_all(files)

@@ -4,3 +4,4 @@ dynaconf
 google-cloud-storage
 git-python
 docopt
+flask
