@@ -14,8 +14,7 @@ class RustMapper(Mapper):
             "readme": f"{exercise_path}/README.md",
             "solution": f"{exercise_path}/example.rs",
             "test": f"{exercise_path}/tests/{exercise_name}.rs",
-            "hint": f"{exercise_path}/.meta/hints.md" if has_hint
-            else None,
+            "hint": f"{exercise_path}/.meta/hints.md" if has_hint else None,
             "starting_point": f"{exercise_path}/src/lib.rs",
         }
 

@@ -1,8 +1,10 @@
-from tqdm import tqdm
-from git import Repo
-from os import listdir, walk
-from models import User, Exercise, Artifact, Language
 from uuid import uuid1
+from os import listdir, walk
+
+from git import Repo
+from tqdm import tqdm
+
+from models import User, Exercise, Artifact
 
 
 def get_or_create_default_user(session):
@@ -21,7 +23,7 @@ def get_or_create_default_user(session):
 
 
 def upload_folder(exercise_path, starting_path, blob_destination, bucket):
-    for dirpath, dirname, filenames in walk(exercise_path):
+    for dirpath, _dirname, filenames in walk(exercise_path):
         rel_dir = dirpath.split(starting_path)[1]
         for file in filenames:
             blob = bucket.blob(f"{blob_destination}{rel_dir}/{file}")
