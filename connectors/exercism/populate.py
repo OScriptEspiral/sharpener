@@ -1,7 +1,7 @@
 from tqdm import tqdm
 from git import Repo
 from os import listdir, walk
-from models import User, Exercise, Artifact
+from models import User, Exercise, Artifact, Language
 from uuid import uuid1
 
 
@@ -28,9 +28,9 @@ def upload_folder(exercise_path, starting_path, blob_destination, bucket):
             blob.upload_from_filename(f"{dirpath}/{file}")
 
 
-def fetch_exercise(name, starting_path, clone_dir,
+def process_exercise(name, starting_path, clone_dir,
                    blob_prefix, mapper, bucket, user):
-    tqdm.write(f"Fetching exercise:{name}")
+    tqdm.write(f"Processing exercise:{name}")
     exercise_path = f"{starting_path}/{name}"
     upload_folder(exercise_path,
                   starting_path,
@@ -64,18 +64,20 @@ def fetch_exercise(name, starting_path, clone_dir,
 
 def populate_exercises(mapper):
     def populate_language(session, storage_client, bucket_name):
+        print(f"Populating {mapper.language} language")
         clone_dir = f"/tmp/{uuid1()}"
         starting_path = f"{clone_dir}/exercises"
         blob_prefix = f"gs://{bucket_name}/{mapper.language}"
 
         bucket = storage_client.bucket(bucket_name)
+        print(f"Cloning {mapper.repo}")
         Repo.clone_from(mapper.repo, clone_dir)
         all_exercises = listdir(f"{starting_path}")
         exercism_user = get_or_create_default_user(session)
 
         exercises, files = zip(*[
-            fetch_exercise(name, starting_path, clone_dir, blob_prefix,
-                           mapper, bucket, exercism_user)
+            process_exercise(name, starting_path, clone_dir, blob_prefix,
+                             mapper, bucket, exercism_user)
             for name in tqdm(all_exercises, unit='exercise')
         ])
 

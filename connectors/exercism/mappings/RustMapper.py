@@ -1,31 +1,24 @@
 import json
+from .Mapper import Mapper
 from os import path
 
 
-class RustMapper(object):
+class RustMapper(Mapper):
     repo = "https://github.com/exercism/rust"
     language = "rust"
 
+    @staticmethod
     def get_files_mappings(prefix, exercise_name, has_hint=False):
+        exercise_path = f"{prefix}/{exercise_name}"
         return {
-            "readme": f"{prefix}/{exercise_name}/README.md",
-            "solution": f"{prefix}/{exercise_name}/example.rs",
-            "test": f"{prefix}/{exercise_name}/tests/{exercise_name}.rs",
-            "hint": f"{prefix}/{exercise_name}/.meta/hints.md" if has_hint
+            "readme": f"{exercise_path}/README.md",
+            "solution": f"{exercise_path}/example.rs",
+            "test": f"{exercise_path}/tests/{exercise_name}.rs",
+            "hint": f"{exercise_path}/.meta/hints.md" if has_hint
             else None,
-            "starting_point": f"{prefix}/{exercise_name}/src/lib.rs",
+            "starting_point": f"{exercise_path}/src/lib.rs",
         }
 
+    @staticmethod
     def hint_exists(exercise_path):
         return path.exists(f"{exercise_path}/.meta/hints.md")
-
-    def pluck_readme(exercise_path):
-        readme = f"{exercise_path}/README.md"
-        with open(readme, 'r') as file:
-            return file.read()
-
-    def get_metadata(exercise_path):
-        config = f"{exercise_path}/config.json"
-        with open(config, 'r') as file:
-            metadata = json.load(file)
-            return metadata['exercises']

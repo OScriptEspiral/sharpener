@@ -14,6 +14,7 @@ from google.cloud import storage
 from sqlalchemy import create_engine, orm
 from connectors import exercism
 from models import Base
+from api import create_app
 
 
 def create_db(db_uri):
@@ -35,9 +36,15 @@ if __name__ == "__main__":
     if ARGS["populate"]:
         SESSION = database_setup(f"{settings.DB_API}{settings.DB_URI}")
         STORAGE_CLIENT = storage.Client()
+        exercism.populate_python(SESSION,
+                                 STORAGE_CLIENT,
+                                 settings.BUCKET_EXERCISES)
+
         exercism.populate_rust(SESSION,
                                STORAGE_CLIENT,
                                settings.BUCKET_EXERCISES)
+
     if ARGS["start_server"]:
-        app = Flask(__name__)
-        app.run()
+        SESSION = database_setup(f"{settings.DB_API}{settings.DB_URI}")
+        APP = create_app(SESSION)
+        APP.run()
