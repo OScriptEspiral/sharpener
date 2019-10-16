@@ -31,7 +31,7 @@ def upload_folder(exercise_path, starting_path, blob_destination, bucket):
 
 
 def process_exercise(name, starting_path, clone_dir,
-                   blob_prefix, mapper, bucket, user):
+                     blob_prefix, mapper, bucket, user):
     tqdm.write(f"Processing exercise:{name}")
     exercise_path = f"{starting_path}/{name}"
     upload_folder(exercise_path,

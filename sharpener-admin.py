@@ -18,7 +18,7 @@ from api import create_app
 
 
 def create_db(db_uri):
-    engine = create_engine(db_uri, client_encoding="utf8",echo=True)
+    engine = create_engine(db_uri, client_encoding="utf8", echo=True)
     return Base.metadata.create_all(engine)
 
 
@@ -31,7 +31,7 @@ def database_setup(db_uri):
 if __name__ == "__main__":
     ARGS = docopt(__doc__)
     if ARGS["create_schema"]:
-        create_db(settings.DB_API+settings.DB_URI)
+        create_db(f"{settings.DB_API}{settings.DB_URI}")
 
     if ARGS["populate"]:
         SESSION = database_setup(f"{settings.DB_API}{settings.DB_URI}")

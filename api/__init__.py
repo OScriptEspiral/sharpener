@@ -1,6 +1,7 @@
 from flask import Flask, request
 from .views import create_exercises_blueprint, create_topics_blueprint
 
+
 def create_app(session):
     exercises = create_exercises_blueprint(session, request)
     topics = create_topics_blueprint(session, request)

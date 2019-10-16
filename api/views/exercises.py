@@ -4,6 +4,7 @@ from models import Exercise, Artifact, Language
 
 DEFAULT_LIMIT = 25
 
+
 def exercise_to_dict(exercise):
     return {
         'name': exercise.name,
@@ -12,6 +13,7 @@ def exercise_to_dict(exercise):
         'topics': exercise.topics,
         'difficulty': exercise.difficulty,
     }
+
 
 def complete_exercise_to_dict(exercise, artifact):
     return {
@@ -53,18 +55,17 @@ def create_exercises_blueprint(session, request):
 
         if known_language:
             exercises = session.query(Exercise)\
-                                .filter_by(language=known_language)\
-                                .order_by(asc(Exercise.difficulty))\
-                                .limit(limit)\
-                                .offset(offset)\
-                                .all()
+                .filter_by(language=known_language)\
+                .order_by(asc(Exercise.difficulty))\
+                .limit(limit)\
+                .offset(offset)\
+                .all()
 
             results = [exercise_to_dict(ex) for ex in exercises]
         else:
             results = []
 
         return jsonify(results)
-
 
     @exercises.route('/<language>/<name>', methods=['GET'])
     def get_specific_exercise(language, name, default_limit=DEFAULT_LIMIT):
@@ -81,13 +82,11 @@ def create_exercises_blueprint(session, request):
                 .offset(offset)\
                 .first()
 
-            results= complete_exercise_to_dict(exercise, artifact)
+            results = complete_exercise_to_dict(exercise, artifact)
 
         else:
             results = []
 
-
         return jsonify(results)
-
 
     return exercises

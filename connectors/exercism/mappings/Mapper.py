@@ -1,6 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 
+
 class Mapper(ABC):
     @staticmethod
     @abstractmethod
@@ -15,7 +16,6 @@ class Mapper(ABC):
         """
 
         """
-
 
     @staticmethod
     def pluck_readme(exercise_path):

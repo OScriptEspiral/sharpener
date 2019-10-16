@@ -17,7 +17,6 @@ class PythonMapper(Mapper):
             "starting_point": f"{exercise_path}/{exercise_name}.py",
         }
 
-
     @staticmethod
     def hint_exists(exercise_path):
         return False

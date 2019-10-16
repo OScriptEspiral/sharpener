@@ -3,6 +3,7 @@ from .languages import Language
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, Column, Integer, String, Text, ARRAY, Enum
 
+
 class Exercise(Base):
     __tablename__ = 'exercises'
 

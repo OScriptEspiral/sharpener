@@ -5,8 +5,10 @@ from models import Exercise, Language
 
 DEFAULT_LIMIT = 1100
 
+
 def pluck_first_column(results):
-    return [r for (r, *k ) in results]
+    return [r for (r, *k) in results]
+
 
 def create_topics_blueprint(session, request):
     topics = Blueprint('topics', __name__)
@@ -17,13 +19,13 @@ def create_topics_blueprint(session, request):
         offset = request.args.get('page', 0)
 
         topic = func.unnest(Exercise.topics)
-        results = session.query(topic)\
-                           .group_by(topic)\
-                           .order_by(asc(topic))\
-                           .limit(limit)\
-                           .offset(offset)\
-                           .all()
-
+        results = session\
+            .query(topic)\
+            .group_by(topic)\
+            .order_by(asc(topic))\
+            .limit(limit)\
+            .offset(offset)\
+            .all()
 
         return jsonify(pluck_first_column(results))
 
@@ -35,17 +37,17 @@ def create_topics_blueprint(session, request):
         known_language = Language.get(language)
         if known_language:
             topic = func.unnest(Exercise.topics)
-            results = session.query(topic, Exercise.language)\
-                              .filter_by(language=known_language)\
-                              .group_by(topic, Exercise.language)\
-                              .order_by(asc(topic))\
-                              .limit(limit)\
-                              .offset(offset)\
-                              .all()
+            results = session\
+                .query(topic, Exercise.language)\
+                .filter_by(language=known_language)\
+                .group_by(topic, Exercise.language)\
+                .order_by(asc(topic))\
+                .limit(limit)\
+                .offset(offset)\
+                .all()
         else:
             results = []
 
         return jsonify(pluck_first_column(results))
-
 
     return topics
