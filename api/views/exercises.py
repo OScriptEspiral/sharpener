@@ -2,8 +2,6 @@ from flask import Blueprint, jsonify
 from sqlalchemy import asc
 from models import Exercise, Artifact, Language
 
-DEFAULT_LIMIT = 25
-
 
 def exercise_to_dict(exercise):
     return {
@@ -31,13 +29,17 @@ def complete_exercise_to_dict(exercise, artifact):
     }
 
 
-def create_exercises_blueprint(session, request):
+def create_exercises_blueprint(session, request, default_limit=25):
     exercises = Blueprint('exercises', __name__)
 
     @exercises.route('/', methods=['GET'])
-    def get_exercises(default_limit=DEFAULT_LIMIT):
-        limit = request.args.get('page_size', default_limit)
-        offset = request.args.get('page', 0)
+    def get_exercises():
+        try:
+            limit = int(request.args.get('page_size', default_limit))
+            offset = int(request.args.get('page', 0))
+        except ValueError:
+            return(400)
+
         exercises = session.query(Exercise)\
                            .order_by(asc(Exercise.difficulty))\
                            .limit(limit)\
@@ -48,44 +50,50 @@ def create_exercises_blueprint(session, request):
         return jsonify(results)
 
     @exercises.route('/<language>', methods=['GET'])
-    def get_exercises_by_language(language, default_limit=DEFAULT_LIMIT):
-        limit = request.args.get('page_size', default_limit)
-        offset = request.args.get('page', 0)
+    def get_exercises_by_language(language):
+        try:
+            limit = int(request.args.get('page_size', default_limit))
+            offset = int(request.args.get('page', 0))
+        except ValueError:
+            return(400)
+
         known_language = Language.get(language)
 
-        if known_language:
-            exercises = session.query(Exercise)\
-                .filter_by(language=known_language)\
-                .order_by(asc(Exercise.difficulty))\
-                .limit(limit)\
-                .offset(offset)\
-                .all()
+        if not known_language:
+            return(404)
 
-            results = [exercise_to_dict(ex) for ex in exercises]
-        else:
-            results = []
+        exercises = session.query(Exercise)\
+            .filter_by(language=known_language)\
+            .order_by(asc(Exercise.difficulty))\
+            .limit(limit)\
+            .offset(offset)\
+            .all()
+
+        results = [exercise_to_dict(ex) for ex in exercises]
 
         return jsonify(results)
 
     @exercises.route('/<language>/<name>', methods=['GET'])
-    def get_specific_exercise(language, name, default_limit=DEFAULT_LIMIT):
-        limit = request.args.get('page_size', default_limit)
-        offset = request.args.get('page', 0)
+    def get_specific_exercise(language, name):
+        try:
+            limit = int(request.args.get('page_size', default_limit))
+            offset = int(request.args.get('page', 0))
+        except ValueError:
+            return(400)
 
         known_language = Language.get(language)
 
-        if known_language:
-            exercise, artifact = session.query(Exercise, Artifact)\
-                .filter_by(language=language, name=name)\
-                .order_by(asc(Exercise.difficulty))\
-                .limit(limit)\
-                .offset(offset)\
-                .first()
+        if not known_language:
+            return 404
 
-            results = complete_exercise_to_dict(exercise, artifact)
+        exercise, artifact = session.query(Exercise, Artifact)\
+            .filter_by(language=language, name=name)\
+            .order_by(asc(Exercise.difficulty))\
+            .limit(limit)\
+            .offset(offset)\
+            .first()
 
-        else:
-            results = []
+        results = complete_exercise_to_dict(exercise, artifact)
 
         return jsonify(results)
 

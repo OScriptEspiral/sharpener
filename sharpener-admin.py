@@ -36,13 +36,13 @@ if __name__ == "__main__":
         create_db(f"{settings.DB_API}{settings.DB_URI}")
 
     if args["populate"]:
-        STORAGE_CLIENT = storage.Client()
+        storage_client = storage.Client()
         exercism.populate_python(session,
-                                 STORAGE_CLIENT,
+                                 storage_client,
                                  settings.BUCKET_EXERCISES)
 
         exercism.populate_rust(session,
-                               STORAGE_CLIENT,
+                               storage_client,
                                settings.BUCKET_EXERCISES)
 
     if args["start_server"]:
