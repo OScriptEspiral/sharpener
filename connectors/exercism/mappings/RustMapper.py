@@ -1,4 +1,3 @@
-import json
 from .Mapper import Mapper
 from os import path
 

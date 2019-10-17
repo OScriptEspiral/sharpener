@@ -1,6 +1,4 @@
 from .Mapper import Mapper
-from os import path
-
 
 class PythonMapper(Mapper):
     repo = "https://github.com/exercism/python"
