@@ -1,15 +1,7 @@
-runtime: python27
-api_version: 1
-threadsafe: true
+runtime: python37
 
-libraries:
-  - name: ssl
-    version: latest
+entrypoint: uwsgi --http-socket :8080 --wsgi-file sharpener-admin.py --callable app
 
-    # [START handlers]
 handlers:
-  - url: /static
-    static_dir: static
-  - url: /.*
-    script: sharpener-admin.app
-    # [END handlers]
+- url: /.*
+  script: auto

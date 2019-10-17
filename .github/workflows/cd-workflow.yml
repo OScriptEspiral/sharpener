@@ -1,0 +1,30 @@
+name: Deploying to GCloud App Engine 
+on:
+  push:
+    branches: 
+    - "master"
+    - "cd"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Google Cloud auth
+      uses: actions/gcloud/auth@master
+      env:
+        GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
+    - uses: actions/checkout@master
+    - name: Setting up environment variables
+      env:
+        DYNACONF_DB_USERNAME: ${{ secrets.db_username }}
+        DYNACONF_DB_PASSWORD: ${{ secrets.db_password }}
+        DYNACONF_DB_API: ${{ secrets.db_api }}
+        DYNACONF_DB_NAME: ${{ secrets.db_name }}
+        DYNACONF_DB_CONN_NAME: ${{ secrets.db_conn_name }}
+      run: env | grep DYNACONF_ > .env
+    - name: Deploy to GCP AppEngine
+      uses: actions/gcloud/cli@master
+      with:
+        args: "app deploy --project $PROJECT_ID app.yaml"
+      env:
+        PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+

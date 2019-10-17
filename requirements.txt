@@ -6,3 +6,5 @@ git-python
 docopt
 flask
 tqdm
+uwsgi
+google-python-cloud-debugger
