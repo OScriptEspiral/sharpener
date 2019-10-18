@@ -27,9 +27,9 @@ def database_is_alive(session):
 
 
 def create_health_check_blueprint(session):
-    healthcheck = Blueprint('/healthcheck', __name__)
+    healthcheck = Blueprint('healthcheck', __name__)
 
-    @healthcheck.route('/healthcheck', methods=['GET'])
+    @healthcheck.route('/', methods=['GET'])
     def check_health():
         services = {
             **database_is_alive(session)

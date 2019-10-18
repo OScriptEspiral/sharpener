@@ -6,65 +6,33 @@ Usage:
   sharpener-admin populate
   sharpener-admin start_server
 """
-
+import googleclouddebugger
 from docopt import docopt
 from dynaconf import settings
 from google.cloud import storage
-from sqlalchemy import create_engine, orm
-from sqlalchemy.engine import url
 from connectors import exercism
-from models import Base
 from api import create_app
+from db import database_setup, create_schema
 
 
-def create_db(db_uri):
-    engine = create_engine(db_uri, client_encoding="utf8", echo=True)
-    return Base.metadata.create_all(engine)
-
-
-def database_setup(api, username, password, name, conn_name=None):
-    unix_socket = f'/cloudsql/{conn_name}'
-    print(url.URL(
-            drivername=api,
-            username=username,
-            password=password,
-            database=name,
-            query={
-                'host': unix_socket
-            }))
-    engine = create_engine(
-        url.URL(
-            drivername=api,
-            username=username,
-            password=password,
-            database=name,
-            query={
-                'host': unix_socket
-            }),
-        client_encoding="utf8")
-
-    sess = orm.sessionmaker(bind=engine)
-    return sess()
-
-
-try:
-    import googleclouddebugger
+is_production = settings.ENV == "production"
+if is_production:
     googleclouddebugger.enable()
-except ImportError:
-    pass
 
+echo = False if is_production else True
 session = database_setup(settings.DB_API,
                          settings.DB_USERNAME,
                          settings.DB_PASSWORD,
                          settings.DB_NAME,
-                         settings.DB_CONN_NAME)
+                         settings.DB_CONN_NAME,
+                         echo=echo)
 
 app = create_app(session)
 
 if __name__ == "__main__":
     args = docopt(__doc__)
     if args["create_schema"]:
-        create_db(f"{settings.DB_API}{settings.DB_URI}")
+        create_schema(settings.DB_API, settings.DB_URI)
 
     if args["populate"]:
         storage_client = storage.Client()

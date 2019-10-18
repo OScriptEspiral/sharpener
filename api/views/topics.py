@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify
 from sqlalchemy.sql.expression import func
 from sqlalchemy import asc
 from models import Exercise, Language
+from api.utils import extract_int_arg, handle_validation_error
 
 
 def pluck_first_column(results):
@@ -12,12 +13,10 @@ def create_topics_blueprint(session, request, default_limit=100):
     topics = Blueprint('topics', __name__)
 
     @topics.route('/', methods=['GET'])
+    @handle_validation_error
     def get_topics():
-        try:
-            limit = int(request.args.get('page_size', default_limit))
-            offset = int(request.args.get('page', 0))
-        except ValueError:
-            return(400)
+        limit = extract_int_arg(request, 'page_size', default=default_limit)
+        offset = extract_int_arg(request, 'page', default=0)
 
         topic = func.unnest(Exercise.topics)
         results = session\
@@ -31,14 +30,12 @@ def create_topics_blueprint(session, request, default_limit=100):
         return jsonify(pluck_first_column(results))
 
     @topics.route('/<language>', methods=['GET'])
+    @handle_validation_error
     def get_topics_by_language(language):
-        try:
-            limit = int(request.args.get('page_size', default_limit))
-            offset = int(request.args.get('page', 0))
-        except ValueError:
-            return(400)
-
+        limit = extract_int_arg(request, 'page_size', default=default_limit)
+        offset = extract_int_arg(request, 'page', default=0)
         known_language = Language.get(language)
+
         if not known_language:
             return(404)
 
