@@ -1,3 +1,5 @@
 [default]
-db_uri = 'postgres:blah@localhost:5432/sharpener'
-db_api = 'postgresql+psycopg2://'
+env="development"
+db_api="postgresql+psycopg2"
+db_name="postgres"
+bucket_exercises="sharpener-exercises"

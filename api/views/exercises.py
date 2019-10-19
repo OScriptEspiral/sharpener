@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from sqlalchemy import asc
 from models import Exercise, Artifact, Language
+from api.utils import extract_int_arg, handle_validation_error
 
 
 def exercise_to_dict(exercise):
@@ -33,12 +34,10 @@ def create_exercises_blueprint(session, request, default_limit=25):
     exercises = Blueprint('exercises', __name__)
 
     @exercises.route('/', methods=['GET'])
+    @handle_validation_error
     def get_exercises():
-        try:
-            limit = int(request.args.get('page_size', default_limit))
-            offset = int(request.args.get('page', 0))
-        except ValueError:
-            return(400)
+        limit = extract_int_arg(request, 'page_size', default=default_limit)
+        offset = extract_int_arg(request, 'page', default=0)
 
         exercises = session.query(Exercise)\
                            .order_by(asc(Exercise.difficulty))\
@@ -50,12 +49,10 @@ def create_exercises_blueprint(session, request, default_limit=25):
         return jsonify(results)
 
     @exercises.route('/<language>', methods=['GET'])
+    @handle_validation_error
     def get_exercises_by_language(language):
-        try:
-            limit = int(request.args.get('page_size', default_limit))
-            offset = int(request.args.get('page', 0))
-        except ValueError:
-            return(400)
+        limit = extract_int_arg(request, 'page_size', default=default_limit)
+        offset = extract_int_arg(request, 'page', default=0)
 
         known_language = Language.get(language)
 
@@ -74,12 +71,10 @@ def create_exercises_blueprint(session, request, default_limit=25):
         return jsonify(results)
 
     @exercises.route('/<language>/<name>', methods=['GET'])
+    @handle_validation_error
     def get_specific_exercise(language, name):
-        try:
-            limit = int(request.args.get('page_size', default_limit))
-            offset = int(request.args.get('page', 0))
-        except ValueError:
-            return(400)
+        limit = extract_int_arg(request, 'page_size', default=default_limit)
+        offset = extract_int_arg(request, 'page', default=0)
 
         known_language = Language.get(language)
 
