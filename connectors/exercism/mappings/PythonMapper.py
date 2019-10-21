@@ -1,5 +1,6 @@
 from .Mapper import Mapper
 
+
 class PythonMapper(Mapper):
     repo = "https://github.com/exercism/python"
     language = "python"
