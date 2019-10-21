@@ -73,19 +73,15 @@ def create_exercises_blueprint(session, request, default_limit=25):
     @exercises.route('/<language>/<name>', methods=['GET'])
     @handle_validation_error
     def get_specific_exercise(language, name):
-        limit = extract_int_arg(request, 'page_size', default=default_limit)
-        offset = extract_int_arg(request, 'page', default=0)
-
         known_language = Language.get(language)
 
         if not known_language:
             return 404
 
         exercise, artifact = session.query(Exercise, Artifact)\
+            .filter(Exercise.artifact_id == Artifact.id)\
             .filter_by(language=language, name=name)\
             .order_by(asc(Exercise.difficulty))\
-            .limit(limit)\
-            .offset(offset)\
             .first()
 
         results = complete_exercise_to_dict(exercise, artifact)

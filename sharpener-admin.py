@@ -32,7 +32,12 @@ app = create_app(session)
 if __name__ == "__main__":
     args = docopt(__doc__)
     if args["create_schema"]:
-        create_schema(settings.DB_API, settings.DB_URI)
+        create_schema(settings.DB_API,
+                      settings.DB_USERNAME,
+                      settings.DB_PASSWORD,
+                      settings.DB_NAME,
+                      settings.DB_CONN_NAME,
+                      echo=echo)
 
     if args["populate"]:
         storage_client = storage.Client()
