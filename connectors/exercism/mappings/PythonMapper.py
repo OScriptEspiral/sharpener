@@ -14,6 +14,7 @@ class PythonMapper(Mapper):
             "test": f"{exercise_path}/{exercise_name}_test.py",
             "hint": f"{exercise_path}/.meta/hints.md" if has_hint else None,
             "starting_point": f"{exercise_path}/{exercise_name}.py",
+            "compressed": f"{exercise_path}/{exercise_name}.tar.gz",
         }
 
     @staticmethod

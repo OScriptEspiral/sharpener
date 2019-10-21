@@ -15,6 +15,7 @@ class RustMapper(Mapper):
             "test": f"{exercise_path}/tests/{exercise_name}.rs",
             "hint": f"{exercise_path}/.meta/hints.md" if has_hint else None,
             "starting_point": f"{exercise_path}/src/lib.rs",
+            "compressed": f"{exercise_path}/{exercise_name}.tar.gz",
         }
 
     @staticmethod
