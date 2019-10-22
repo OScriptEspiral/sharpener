@@ -25,6 +25,7 @@ def complete_exercise_to_dict(exercise, artifact):
         'readme': artifact.readme,
         'solution': artifact.solution,
         'starting_point': artifact.starting_point,
+        'compressed': artifact.compressed,
         'test': artifact.test,
         'hint': artifact.hint,
     }

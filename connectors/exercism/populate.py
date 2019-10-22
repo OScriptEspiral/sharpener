@@ -1,3 +1,4 @@
+import tarfile
 from uuid import uuid1
 from os import listdir, walk
 
@@ -34,6 +35,9 @@ def process_exercise(name, starting_path, clone_dir,
                      blob_prefix, mapper, bucket, user):
     tqdm.write(f"Processing exercise:{name}")
     exercise_path = f"{starting_path}/{name}"
+    with tarfile.open(f"{exercise_path}/{name}.tar.gz", "w:gz") as f:
+        f.add(f"{exercise_path}/", arcname=name, recursive=True)
+
     upload_folder(exercise_path,
                   starting_path,
                   mapper.language,
@@ -59,6 +63,7 @@ def process_exercise(name, starting_path, clone_dir,
                      starting_point=mappings["starting_point"],
                      test=mappings["test"],
                      hint=mappings["hint"],
+                     compressed=mappings["compressed"],
                      exercise=exercise)
 
     return (exercise, files)
@@ -92,3 +97,4 @@ def populate_exercises(mapper):
         session.commit()
 
     return populate_language
+

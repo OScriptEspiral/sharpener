@@ -11,6 +11,7 @@ class Artifact(Base):
     solution = Column(String, nullable=False)
     starting_point = Column(String, nullable=False)
     test = Column(String, nullable=False)
+    compressed = Column(String, nullable=False)
     hint = Column(String, nullable=True)
     exercise = relationship("Exercise",
                             back_populates="artifact",
