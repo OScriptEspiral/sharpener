@@ -10,9 +10,9 @@ class User(Base):
     nickname = Column(String, nullable=False)
     is_teacher = Column(Boolean, default=False)
     token = Column(String, nullable=False)
-    avatar_url = Column(String, nullable=True)
     github_token = Column(String, nullable=False)
-    github_repositories = Column(String, nullable=False)
+    avatar_url = Column(String, nullable=True)
+    github_repositories = Column(String, nullable=True)
     created_at = Column(DateTime, nullable=False)
 
     def __repr__(self):

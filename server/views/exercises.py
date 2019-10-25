@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from sqlalchemy import asc
 from models import Exercise, Artifact, Language
-from api.utils import extract_int_arg, handle_validation_error
+from server.utils import extract_int_arg, handle_validation_error
 
 
 def exercise_to_dict(exercise):

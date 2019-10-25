@@ -3,7 +3,7 @@ runtime: python37
 entrypoint: uwsgi --http-socket :8080 --wsgi-file sharpener-admin.py --callable app
 
 liveness_check:
-  path: "api/healthcheck"
+  path: "/api/healthcheck"
   check_interval_sec: 30
   timeout_sec: 4
   failure_threshold: 2

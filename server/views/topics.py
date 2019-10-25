@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 from sqlalchemy.sql.expression import func
 from sqlalchemy import asc
 from models import Exercise, Language
-from api.utils import extract_int_arg, handle_validation_error
+from server.utils import extract_int_arg, handle_validation_error
 
 
 def pluck_first_column(results):

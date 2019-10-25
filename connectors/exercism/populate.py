@@ -8,8 +8,8 @@ from tqdm import tqdm
 from models import User, Exercise, Artifact
 
 
-def get_or_create_default_user(session):
-    default_user = session.query(User).filter(
+def get_or_create_default_user(db_session):
+    default_user = db_session.query(User).filter(
         User.email == 'hello@exercism.io').first()
     if not default_user:
         exercism_user = User(email="hello@exercism.io",
@@ -17,8 +17,8 @@ def get_or_create_default_user(session):
                              nickname="exercism",
                              is_teacher=True,
                              github_token="")
-        session.add(exercism_user)
-        session.flush()
+        db_session.add(exercism_user)
+        db_session.flush()
         return exercism_user
     return default_user
 
@@ -70,7 +70,7 @@ def process_exercise(name, starting_path, clone_dir,
 
 
 def populate_exercises(mapper):
-    def populate_language(session, storage_client, bucket_name):
+    def populate_language(db_session, storage_client, bucket_name):
         print(f"Populating {mapper.language} language")
         clone_dir = f"/tmp/{uuid1()}"
         starting_path = f"{clone_dir}/exercises"
@@ -80,7 +80,7 @@ def populate_exercises(mapper):
         print(f"Cloning {mapper.repo}")
         Repo.clone_from(mapper.repo, clone_dir)
         all_exercises = listdir(f"{starting_path}")
-        exercism_user = get_or_create_default_user(session)
+        exercism_user = get_or_create_default_user(db_session)
 
         exercises, files = zip(*[
             process_exercise(name, starting_path, clone_dir, blob_prefix,
@@ -88,13 +88,13 @@ def populate_exercises(mapper):
             for name in tqdm(all_exercises, unit='exercise')
         ])
 
-        session.add_all(files)
-        session.commit()
-        session.expire_all()
+        db_session.add_all(files)
+        db_session.commit()
+        db_session.expire_all()
         for (exercise, file_) in zip(exercises, files):
             exercise.artifact_id = file_.id
-        session.add_all(exercises)
-        session.commit()
+        db_session.add_all(exercises)
+        db_session.commit()
 
     return populate_language
 

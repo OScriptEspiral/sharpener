@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>Sharpener</title>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+	<link rel="icon" href="/static/img/favicon.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+	<div id="root"/>
+	  <script>	
+	    window.user = {
+	      'email': {{ ('"{}"'.format(email) if email else 'undefined') | safe}},
+	      'name': {{ ('"{}"'.format(name) if name else 'undefined') | safe}},
+	      'token': {{ ('"{}"'.format(token) if token else 'undefined') | safe}},
+	      'nickname': {{ ('"{}"'.format(nickname) if nickname else 'undefined') | safe}},
+	      'avatar': {{ ('"{}"'.format(avatar) if avatar else 'undefined') | safe}},
+	      'isLoggedIn': {{'true' if  is_logged_in else 'false'}},
+	    };
+	    </script>
+	{% if debug %}
+	<script src="http://localhost:3000/static/js/bundle.js""></script>
+	<script src="http://localhost:3000/static/js/main.chunk.js"></script>
+	<script src="http://localhost:3000/static/js/0.chunk.js"></script>
+	{% else %}
+	<script type="text/javascript" src="/static/bundle.js"></script>
+	{% endif %}
+  </body>
+</html>
