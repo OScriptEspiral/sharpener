@@ -1,7 +1,8 @@
 from .base import Base
-from .languages import Language
+from .language import Language
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, Column, Integer, String, Text, ARRAY, Enum
+from .track_exercise import track_exercise_association
 
 
 class Exercise(Base):
@@ -17,3 +18,6 @@ class Exercise(Base):
     artifact = relationship("Artifact",
                             back_populates="exercise",
                             uselist=False)
+    exercises = relationship("Track",
+                             secondary=track_exercise_association,
+                             back_populates="exercises")
