@@ -37,7 +37,7 @@ jobs:
         DYNACONF_GITHUB_CLIENT_ID: ${{ client_id }
         DYNACONF_GITHUB_URI_USER: "https://github.com/login/oauth/access_token"
         DYNACONF_GITHUB_URI_OAUTH: "https://api.github.com/user"
-        run: env | grep DYNACONF_ > .env
+      run: env | grep DYNACONF_ > .env
     - name: Deploy to GCP AppEngine
       uses: actions/gcloud/cli@master
       with:
