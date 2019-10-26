@@ -8,18 +8,11 @@ class Enrollment(Base):
     __tablename__ = 'enrollments'
 
     user = Column(String, ForeignKey('users.email'), primary_key=True)
-    class_id = Column('class_id', Integer, primary_key=True)
-    track_name = Column('track_name', String, primary_key=True)
-    track_owner = Column('track_owner', String, primary_key=True)
+    track_class_id = Column('track_class_id',
+                            ForeignKey('tracks_classes_association.id'),
+                            primary_key=True)
 
-    track_class_composite_key = ForeignKeyConstraint(
-        ['class_id', 'track_name', 'track_owner'],
-        [
-            'tracks_classes_association.class_id',
-            'tracks_classes_association.name',
-            'tracks_classes_association.owner',
-        ])
-
+    track_class = relationship('TrackClassAssociation', uselist=False)
     submissions = relationship('Submission')
 
     def __repr__(self):

@@ -2,7 +2,6 @@ from datetime import datetime
 from .base import Base
 from sqlalchemy import Column, String, Boolean, DateTime
 from sqlalchemy.orm import relationship
-from .user_classroom import user_class_association
 
 
 class User(Base):
@@ -19,7 +18,12 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow,
                         nullable=False)
     creator = relationship('Track')
-    classes = relationship("Class", secondary=user_class_association,
+
+    class_owner = relationship('Class', uselist=False)
+    created_exercises = relationship('Exercise', back_populates="created_by")
+    enrolled_in = relationship('Enrollment')
+
+    classes = relationship('Class', secondary="users_classes_association",
                            back_populates="users")
 
     def __repr__(self):

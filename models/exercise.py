@@ -2,7 +2,6 @@ from .base import Base
 from .language import Language
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, Column, Integer, String, Text, ARRAY, Enum
-from .track_exercise import track_exercise_association
 
 
 class Exercise(Base):
@@ -19,5 +18,7 @@ class Exercise(Base):
                             back_populates="exercise",
                             uselist=False)
     tracks = relationship("Track",
-                          secondary=track_exercise_association,
+                          secondary="tracks_exercises_association",
                           back_populates="exercises")
+    created_by = relationship("User", uselist=False,
+                              back_populates="created_exercises")

@@ -1,17 +1,22 @@
 from .base import Base
-from sqlalchemy import (Column, String, ForeignKey, Table,
-                        Integer, ForeignKeyConstraint)
+from sqlalchemy import (Column, String, ForeignKey, Integer,
+                        ForeignKeyConstraint, UniqueConstraint,
+                        )
+from sqlalchemy.orm import relationship
 
-class_id = Column('class_id', Integer, ForeignKey('classes.id'),
-                  primary_key=True)
 
-track_name = Column('track_name', String, primary_key=True)
+class TrackClassAssociation(Base):
+    __tablename__ = 'tracks_classes_association'
+    __table_args__ = (
+        ForeignKeyConstraint(['track_name', 'track_owner'],
+                             ['tracks.name', 'tracks.owner']),
+        UniqueConstraint('class_id', 'track_name', 'track_owner')
+    )
 
-track_owner = Column('track_owner', String, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
+    class_id = Column('class_id', Integer, ForeignKey('classes.id'))
+    track_name = Column('track_name', String)
+    track_owner = Column('track_owner', String)
 
-track_composite_key = ForeignKeyConstraint(['track_name', 'track_owner'],
-                                           ['tracks.name', 'tracks.owner'])
-
-track_class_association = Table('tracks_classes_association', Base.metadata,
-                                class_id, track_name, track_owner,
-                                track_composite_key)
+    track = relationship('Track', uselist=False)
+    class_ref = relationship('Class', uselist=False)

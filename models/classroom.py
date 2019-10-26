@@ -2,8 +2,8 @@ from .base import Base
 from .language import Language
 from sqlalchemy import Column, String, Integer, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from .user_classroom import user_class_association
-from .track_classroom import track_class_association
+from .user_classroom import UserClassAssociation
+from .track_classroom import TrackClassAssociation
 
 
 class Class(Base):
@@ -14,10 +14,12 @@ class Class(Base):
     name = Column(String, nullable=False)
     invite_token = Column(String, nullable=False)
     language = Column(Enum(Language))
-    users = relationship("User", secondary=user_class_association,
+    users = relationship("User", secondary='users_classes_association',
                          back_populates="classes")
-    tracks = relationship("Track", secondary=track_class_association,
+    tracks = relationship("Track", secondary='tracks_classes_association',
                           back_populates="classes")
+
+    tracks_classes = relationship("TrackClassAssociation")
 
     def __repr__(self):
         return ("<Class(id='%s', name='%s', owner='%s')>"

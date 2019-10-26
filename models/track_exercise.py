@@ -3,28 +3,21 @@ from .language import Language
 from sqlalchemy import (Column, String, Table,
                         Integer, ForeignKeyConstraint, Enum)
 
-track_name = Column('track_name', String, primary_key=True)
 
-track_owner = Column('track_owner', String, primary_key=True)
+class TrackExerciseAssociation(Base):
+    __tablename__ = 'tracks_exercises_association'
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['exercise_name', 'exercise_language'],
+            ['exercises.name', 'exercises.language']
+        ),
+        ForeignKeyConstraint(['track_name', 'track_owner'],
+                             ['tracks.name', 'tracks.owner'])
+    )
 
-exercise_name = Column('exercise_name', String, primary_key=True)
-
-exercise_language = Column('exercise_language',
-                           Enum(Language), primary_key=True)
-
-step = Column('step', Integer)
-
-exercise_composite_key = ForeignKeyConstraint(
-    ['exercise_name', 'exercise_language'],
-    ['exercises.name', 'exercises.language']
-)
-
-track_composite_key = ForeignKeyConstraint(['track_name', 'track_owner'],
-                                           ['tracks.name', 'tracks.owner'])
-
-
-track_exercise_association = Table('tracks_exercises_association',
-                                   Base.metadata,
-                                   exercise_name, exercise_language,
-                                   track_name, track_owner, step,
-                                   track_composite_key, exercise_composite_key)
+    id = Column('id', Integer, primary_key=True)
+    track_name = Column('track_name', String)
+    track_owner = Column('track_owner', String)
+    exercise_name = Column('exercise_name', String)
+    exercise_language = Column('exercise_language', Enum(Language))
+    step = Column('step', Integer)

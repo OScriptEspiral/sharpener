@@ -16,7 +16,8 @@ def get_or_create_default_user(db_session):
                              name="exercism.io",
                              nickname="exercism",
                              is_teacher=True,
-                             github_token="")
+                             github_token="",
+                             token="")
         db_session.add(exercism_user)
         db_session.flush()
         return exercism_user
@@ -97,4 +98,3 @@ def populate_exercises(mapper):
         db_session.commit()
 
     return populate_language
-
