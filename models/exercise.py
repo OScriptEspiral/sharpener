@@ -18,6 +18,6 @@ class Exercise(Base):
     artifact = relationship("Artifact",
                             back_populates="exercise",
                             uselist=False)
-    exercises = relationship("Track",
-                             secondary=track_exercise_association,
-                             back_populates="exercises")
+    tracks = relationship("Track",
+                          secondary=track_exercise_association,
+                          back_populates="exercises")

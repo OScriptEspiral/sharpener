@@ -1,6 +1,7 @@
 from .base import Base
 from sqlalchemy import (Column, String, Integer, ForeignKey,
                         ForeignKeyConstraint)
+from sqlalchemy.orm import relationship
 
 
 class Enrollment(Base):
@@ -18,6 +19,8 @@ class Enrollment(Base):
             'tracks_classes_association.name',
             'tracks_classes_association.owner',
         ])
+
+    submissions = relationship('Submission')
 
     def __repr__(self):
         return ("<Enrollment(user='%s', class_id='%s', \

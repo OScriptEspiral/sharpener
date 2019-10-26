@@ -1,3 +1,4 @@
+from datetime import datetime
 from .base import Base
 from sqlalchemy import Column, String, Boolean, DateTime
 from sqlalchemy.orm import relationship
@@ -15,7 +16,8 @@ class User(Base):
     github_token = Column(String, nullable=False)
     avatar_url = Column(String, nullable=True)
     github_repositories = Column(String, nullable=True)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow,
+                        nullable=False)
     creator = relationship('Track')
     classes = relationship("Class", secondary=user_class_association,
                            back_populates="users")
