@@ -15,19 +15,9 @@ from server import create_app
 from db import database_setup, create_schema
 
 
-is_production = settings.ENV == "production"
-if is_production:
-    googleclouddebugger.enable()
-
-echo = False if is_production else True
-db_session = database_setup(settings.DB_API,
-                            settings.DB_USERNAME,
-                            settings.DB_PASSWORD,
-                            settings.DB_NAME,
-                            settings.DB_CONN_NAME,
-                            echo=echo)
-
 local = __name__ == "__main__"
+is_production = settings.ENV == "production"
+is_development = not is_production
 
 github_config = {
     "oauth_uri": settings.GITHUB_URI_OAUTH,
@@ -36,7 +26,20 @@ github_config = {
     "client_secret": settings.GITHUB_CLIENT_SECRET,
 }
 
-app = create_app(db_session, github_config, settings.FLASK_SECRET, debug=local)
+if is_production:
+    googleclouddebugger.enable()
+
+
+db_session = database_setup(settings.DB_API,
+                            settings.DB_USERNAME,
+                            settings.DB_PASSWORD,
+                            settings.DB_NAME,
+                            settings.get("DB_CONN_NAME"),
+                            echo=is_development,
+                            production=is_production)
+
+app = create_app(db_session, github_config, settings.FLASK_SECRET,
+                 debug=is_development)
 
 if local:
     args = docopt(__doc__)
@@ -45,8 +48,9 @@ if local:
                       settings.DB_USERNAME,
                       settings.DB_PASSWORD,
                       settings.DB_NAME,
-                      settings.DB_CONN_NAME,
-                      echo=echo)
+                      settings.get("DB_CONN_NAME"),
+                      echo=is_development,
+                      production=is_production)
 
     if args["populate"]:
         storage_client = storage.Client()

@@ -1,5 +1,5 @@
 [default]
-env="development"
-db_api="postgresql+psycopg2"
-db_name="postgres"
-bucket_exercises="sharpener-exercises"
+ENV="development"
+DB_API="postgresql+psycopg2"
+DB_NAME="postgres"
+BUCKET_EXERCISES="sharpener-exercises"

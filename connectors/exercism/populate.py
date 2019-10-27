@@ -16,8 +16,8 @@ def get_or_create_default_user(db_session):
                              name="exercism.io",
                              nickname="exercism",
                              is_teacher=True,
-                             github_token="",
-                             token="")
+                             github_token="sample-github-token",
+                             token="sample-github-token")
         db_session.add(exercism_user)
         db_session.flush()
         return exercism_user
