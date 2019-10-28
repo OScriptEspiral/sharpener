@@ -19,7 +19,8 @@ class Track(Base):
     created_at = Column(DateTime, default=datetime.utcnow,
                         nullable=False)
 
-    tracks_classes = relationship("TrackClassAssociation")
+    tracks_classes = relationship("TrackClassAssociation",
+                                  back_populates="track")
 
     def __repr__(self):
-        return "<Track(name='%s', creator='%s')>" % (self.name, self.creator)
+        return "<Track(name='%s', owner='%s')>" % (self.name, self.owner)

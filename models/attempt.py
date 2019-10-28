@@ -8,9 +8,7 @@ from .language import Language
 
 class Attempt(Base):
     __tablename__ = 'attempts'
-
-    id = Column('id', Integer, autoincrement=True, primary_key=True)
-    submission_id = Column(ForeignKey('submissions.id'), nullable=False)
+    submission_id = Column(ForeignKey('submissions.id'), primary_key=True)
     submission = relationship('Submission')
     attempt_number = Column('attempt_number', Integer, primary_key=True)
 

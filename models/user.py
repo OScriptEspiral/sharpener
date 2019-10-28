@@ -17,14 +17,14 @@ class User(Base):
     github_repositories = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow,
                         nullable=False)
-    creator = relationship('Track')
 
-    class_owner = relationship('Class', uselist=False)
+    tracks_owned = relationship('Track')
+    classes_owned = relationship('Class')
     created_exercises = relationship('Exercise', back_populates="created_by")
-    enrolled_in = relationship('Enrollment')
+    enrolled_in = relationship('Enrollment', back_populates="enrolled_user")
 
     classes = relationship('Class', secondary="users_classes_association",
-                           back_populates="users")
+                           back_populates="students")
 
     def __repr__(self):
         return "<User(name='%s', email='%s')>" % (self.name, self.email)

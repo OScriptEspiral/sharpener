@@ -1,7 +1,7 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, Response
 from sqlalchemy import asc
 from models import Exercise, Artifact, Language
-from server.utils import extract_int_arg, handle_validation_error
+from server.utils import extract_int_arg, handle_validation_error, extract_language
 
 
 def exercise_to_dict(exercise):
@@ -54,11 +54,7 @@ def create_exercises_blueprint(session, request, default_limit=25):
     def get_exercises_by_language(language):
         limit = extract_int_arg(request, 'page_size', default=default_limit)
         offset = extract_int_arg(request, 'page', default=0)
-
-        known_language = Language.get(language)
-
-        if not known_language:
-            return(404)
+        known_language = extract_language(language)
 
         exercises = session.query(Exercise)\
             .filter_by(language=known_language)\
@@ -75,15 +71,19 @@ def create_exercises_blueprint(session, request, default_limit=25):
     @handle_validation_error
     def get_specific_exercise(language, name):
         known_language = Language.get(language)
-
         if not known_language:
-            return 404
+            return Response("Unknown language",
+                            status=404)
 
         exercise, artifact = session.query(Exercise, Artifact)\
             .filter(Exercise.artifact_id == Artifact.id)\
             .filter_by(language=language, name=name)\
             .order_by(asc(Exercise.difficulty))\
             .first()
+
+        if not exercise:
+            return Response("Exercise doesn't exist",
+                            status=404)
 
         results = complete_exercise_to_dict(exercise, artifact)
 

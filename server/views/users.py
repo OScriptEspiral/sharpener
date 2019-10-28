@@ -1,8 +1,10 @@
 from datetime import datetime
 from flask import Blueprint, jsonify, session, Response
 import requests
-from models import User
+from models import User, UserClassAssociation
 from uuid import uuid4
+from server.utils import (extract_token, extract_user,
+                          extract_class_from_token, handle_validation_error)
 
 
 def fetch_access_token(code, github_config):
@@ -123,4 +125,5 @@ def create_users_blueprint(db_session, request, github_config):
             }
 
         return jsonify(response)
+
     return users

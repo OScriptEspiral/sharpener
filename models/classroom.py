@@ -1,25 +1,23 @@
 from .base import Base
-from .language import Language
-from sqlalchemy import Column, String, Integer, ForeignKey, Enum
+from sqlalchemy import Column, String, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from .user_classroom import UserClassAssociation
-from .track_classroom import TrackClassAssociation
 
 
 class Class(Base):
     __tablename__ = 'classes'
+    __table_args__ = (UniqueConstraint('name', 'owner'),)
 
     id = Column(Integer, primary_key=True)
     owner = Column(String, ForeignKey('users.email'))
     name = Column(String, nullable=False)
     invite_token = Column(String, nullable=False)
-    language = Column(Enum(Language))
-    users = relationship("User", secondary='users_classes_association',
-                         back_populates="classes")
+    students = relationship("User", secondary='users_classes_association',
+                            back_populates="classes")
     tracks = relationship("Track", secondary='tracks_classes_association',
                           back_populates="classes")
 
-    tracks_classes = relationship("TrackClassAssociation")
+    tracks_classes = relationship("TrackClassAssociation",
+                                  back_populates="class_ref")
 
     def __repr__(self):
         return ("<Class(id='%s', name='%s', owner='%s')>"

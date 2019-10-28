@@ -38,8 +38,11 @@ db_session = database_setup(settings.DB_API,
                             echo=is_development,
                             production=is_production)
 
+storage_client = storage.Client()
+bucket_submissions = storage_client.bucket(settings.BUCKET_SUBMISSIONS)
 app = create_app(db_session, github_config, settings.FLASK_SECRET,
-                 debug=is_development)
+                 bucket_submissions, debug=is_development)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 if local:
     args = docopt(__doc__)
@@ -53,7 +56,6 @@ if local:
                       production=is_production)
 
     if args["populate"]:
-        storage_client = storage.Client()
         exercism.populate_python(db_session,
                                  storage_client,
                                  settings.BUCKET_EXERCISES)

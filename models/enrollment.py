@@ -1,6 +1,6 @@
+from datetime import datetime
 from .base import Base
-from sqlalchemy import (Column, String, Integer, ForeignKey,
-                        ForeignKeyConstraint)
+from sqlalchemy import (Column, String, ForeignKey, DateTime)
 from sqlalchemy.orm import relationship
 
 
@@ -12,10 +12,14 @@ class Enrollment(Base):
                             ForeignKey('tracks_classes_association.id'),
                             primary_key=True)
 
-    track_class = relationship('TrackClassAssociation', uselist=False)
+    track_class = relationship('TrackClassAssociation', uselist=False,
+                               back_populates="enrollments")
     submissions = relationship('Submission')
+    enrolled_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    enrolled_user = relationship('User', back_populates="enrolled_in",
+                                 uselist=False)
 
     def __repr__(self):
-        return ("<Enrollment(user='%s', class_id='%s', \
-                track='%s', class='%s')>" %
-                (self.user, self.class_id, self.track, self.classroom))
+        return ("<Enrollment(user='%s', track_class_id='%s'')>" %
+                (self.user, self.track_class_id))

@@ -1,4 +1,5 @@
 import logging
+from models import User, Language, Track, Class
 from flask import make_response, jsonify
 from functools import wraps
 
@@ -10,6 +11,12 @@ class ValidationError(Exception):
         self.field = field
 
 
+class TokenError(Exception):
+    def __init__(self, original, message):
+        self.original = original
+        self.message = message
+
+
 def handle_validation_error(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -18,7 +25,10 @@ def handle_validation_error(func):
         except ValidationError as err:
             logging.warn(f"Validation Error: {err.original}")
             return make_response(jsonify(error=err.message,
-                                         field=err.field), status=400)
+                                         field=err.field), 400)
+        except TokenError as err:
+            logging.warn(f"Token error: {err.original}")
+            return make_response(jsonify(error=err.message), 401)
     return wrapper
 
 
@@ -27,3 +37,68 @@ def extract_int_arg(request, key, default=0):
         return int(request.args.get(key, default))
     except ValueError as err:
         raise ValidationError("Not an integer", err, key)
+
+
+def extract_language(language):
+    known_language = Language.get(language)
+    if not known_language:
+        message = f"Unknown language {language}"
+        return ValidationError(message, message, "language")
+
+
+def extract_token(request):
+    bearer_token = request.headers.get('authorization')
+    if not bearer_token:
+        message = 'Authentication token header is missing'
+        raise TokenError('no token', message)
+    token = bearer_token.rsplit('Bearer ')[1]
+    return token
+
+
+def extract_user(db_session, token):
+    user = db_session.query(User)\
+        .filter_by(token=token)\
+        .first()
+    if not user:
+        message = 'Unknown indetification token'
+        print(token)
+        raise TokenError('bad token', message)
+
+    return user
+
+
+def extract_track(name, db_session, user):
+    existing_track = db_session.query(Track)\
+        .filter_by(name=name, owner=user.email)\
+        .first()
+
+    if not existing_track:
+        message = "Track doesn't exist."
+        raise ValidationError(message, message, 'track')
+
+    return existing_track
+
+
+def extract_class(name, db_session, user):
+    existing_class = db_session.query(Class)\
+        .filter_by(name=name, owner=user.email)\
+        .first()
+
+    if not existing_class:
+        message = "Class doesn't exist."
+        raise ValidationError(message, message, 'class')
+
+    return existing_class
+
+
+def extract_class_from_token(token, db_session):
+    print(token)
+    existing_class = db_session.query(Class)\
+        .filter_by(invite_token=token)\
+        .first()
+
+    if not existing_class:
+        message = "Class doesn't exist."
+        raise ValidationError(message, message, 'class')
+
+    return existing_class
