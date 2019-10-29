@@ -1,5 +1,5 @@
 import logging
-from models import User, Language, Track, Class
+from models import User, Language, Track, Class, Submission
 from flask import make_response, jsonify
 from functools import wraps
 
@@ -50,7 +50,7 @@ def extract_token(request):
     bearer_token = request.headers.get('authorization')
     if not bearer_token:
         message = 'Authentication token header is missing'
-        raise TokenError('no token', message)
+        raise TokenError(message, message)
     token = bearer_token.rsplit('Bearer ')[1]
     return token
 
@@ -61,8 +61,7 @@ def extract_user(db_session, token):
         .first()
     if not user:
         message = 'Unknown indetification token'
-        print(token)
-        raise TokenError('bad token', message)
+        raise TokenError('Bad identification token', message)
 
     return user
 
@@ -92,13 +91,25 @@ def extract_class(name, db_session, user):
 
 
 def extract_class_from_token(token, db_session):
-    print(token)
     existing_class = db_session.query(Class)\
         .filter_by(invite_token=token)\
         .first()
 
     if not existing_class:
-        message = "Class doesn't exist."
-        raise ValidationError(message, message, 'class')
+        message = "Your invite token is invalid."
+        original = "No class associated with this token."
+        raise TokenError(message, original)
 
     return existing_class
+
+
+def extract_submission(token, db_session):
+    existing_submission = db_session.query(Submission)\
+        .filter_by(submission_token=token)\
+        .first()
+
+    if not existing_submission:
+        message = "Submission token is invalid."
+        raise TokenError(message, message)
+
+    return existing_submission

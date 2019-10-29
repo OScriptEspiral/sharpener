@@ -72,10 +72,8 @@ def create_tracks_blueprint(db_session, request):
         token = extract_token(request)
         user = extract_user(db_session, token)
         if not user.is_teacher:
-            return Response(
-                response="Only teachers can enroll classes in tracks.",
-                status=403
-            )
+            return Response(response="Only teachers can enroll classes in tracks.",
+                            status=403)
 
         existing_class = extract_class(class_name, db_session, user)
         existing_track = extract_track(track_name, db_session, user)

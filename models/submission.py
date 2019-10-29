@@ -1,8 +1,9 @@
+from uuid import uuid4
 from .base import Base
 from sqlalchemy import (Column, String, Integer, ForeignKeyConstraint,
                         UniqueConstraint, Enum)
 from sqlalchemy.orm import relationship
-from .submission_state import SubmissionState
+from .submission_state import SubmissionStatus
 from .language import Language
 
 
@@ -28,8 +29,10 @@ class Submission(Base):
     exercise_language = Column('exercise_language', Enum(Language))
     exercise = relationship('Exercise')
     attempts = relationship('Attempt')
-    state = Column('state', Enum(SubmissionState),
-                   default=SubmissionState('pending'))
+    submission_token = Column('submission_token', String, nullable=False,
+                              default=uuid4())
+    status = Column('status', Enum(SubmissionStatus),
+                    default=SubmissionStatus('pending'))
 
     def __repr__(self):
         return ("<Submission(user='%s', class_id='%s', \

@@ -14,7 +14,7 @@ class Attempt(Base):
 
     solution_file = Column(String, nullable=False)
     test_coverage = Column(String, nullable=False)
-    test_ouput = Column(String, nullable=False)
+    test_output = Column(String, nullable=False)
     test_checksum = Column(String, nullable=False)
     submitted_at = Column(DateTime, default=datetime.utcnow,
                           nullable=False)
