@@ -10,7 +10,7 @@ class User(Base):
     email = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     nickname = Column(String, nullable=False)
-    is_teacher = Column(Boolean, default=False)
+    is_teacher = Column(Boolean, default=True)
     token = Column(String, nullable=False)
     github_token = Column(String, nullable=False)
     avatar_url = Column(String, nullable=True)

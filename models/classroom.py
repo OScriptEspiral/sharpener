@@ -1,5 +1,7 @@
+from datetime import datetime
 from .base import Base
-from sqlalchemy import Column, String, Integer, ForeignKey, UniqueConstraint
+from sqlalchemy import (Column, String, Integer, ForeignKey, UniqueConstraint,
+                        DateTime)
 from sqlalchemy.orm import relationship
 
 
@@ -11,6 +13,8 @@ class Class(Base):
     owner = Column(String, ForeignKey('users.email'))
     name = Column(String, nullable=False)
     invite_token = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow,
+                        nullable=False)
     students = relationship("User", secondary='users_classes_association',
                             back_populates="classes")
     tracks = relationship("Track", secondary='tracks_classes_association',

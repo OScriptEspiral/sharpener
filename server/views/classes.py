@@ -1,11 +1,40 @@
-from flask import Blueprint, Response
+from flask import Blueprint, Response, jsonify
 from models import Class, Track
 from server.utils import extract_token, extract_user, handle_validation_error
 from uuid import uuid4
 
 
+def extract_class_data(classroom):
+    return {
+        "name": classroom.name,
+        "created_at": classroom.created_at.isoformat(),
+        "members": len(classroom.students),
+        "tracks": len(classroom.tracks_classes),
+    }
+
+
 def create_classes_blueprint(db_session, request):
     classes = Blueprint('classes', __name__)
+
+    @classes.route('/', methods=['GET'])
+    @handle_validation_error
+    def get_all_classes():
+        token = extract_token(request)
+        user = extract_user(db_session, token)
+
+        if not user.is_teacher:
+            return Response(response="Only teachers can see classes.",
+                            status=403)
+
+        existing_classes = db_session\
+            .query(Class)\
+            .filter_by(owner=user.email)\
+            .all()
+
+        classes_data = [extract_class_data(classroom)
+                        for classroom in existing_classes]
+
+        return jsonify(classes_data)
 
     @classes.route('/<name>', methods=['POST'])
     @handle_validation_error
