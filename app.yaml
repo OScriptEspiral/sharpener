@@ -1,5 +1,6 @@
+---
 runtime: python37
-env:flex
+env: flex
 entrypoint: uwsgi --http-socket :8080 --wsgi-file sharpener-admin.py --callable app
 
 liveness_check:
@@ -10,5 +11,5 @@ liveness_check:
   success_threshold: 2
 
 handlers:
-- url: /.*
-  script: auto
+  - url: /.*
+    script: auto

@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, jsonify
 from models import Class, Track
 from server.utils import extract_token, extract_user, handle_validation_error
+from flasgger import swag_from
 from uuid import uuid4
 
 
@@ -18,6 +19,7 @@ def create_classes_blueprint(db_session, request):
 
     @classes.route('/', methods=['GET'])
     @handle_validation_error
+    @swag_from('classes_get.yaml')
     def get_all_classes():
         token = extract_token(request)
         user = extract_user(db_session, token)
@@ -38,6 +40,7 @@ def create_classes_blueprint(db_session, request):
 
     @classes.route('/<name>', methods=['POST'])
     @handle_validation_error
+    @swag_from('classes_post.yaml')
     def create_class(name):
         token = extract_token(request)
         user = extract_user(db_session, token)

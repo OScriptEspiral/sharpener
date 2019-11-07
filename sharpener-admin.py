@@ -7,6 +7,7 @@ Usage:
   sharpener-admin start_server
 """
 import googleclouddebugger
+from flasgger import Swagger
 from docopt import docopt
 from dynaconf import settings
 from google.cloud import storage
@@ -18,6 +19,31 @@ from db import database_setup, create_schema
 local = __name__ == "__main__"
 is_production = settings.ENV == "production"
 is_development = not is_production
+
+template = {
+    "swagger": "2.0",
+    "info": {
+        "description": "API for Sharpener",
+        "contact": {
+            "responsibleDeveloper": "Pedro Morello Abbud",
+            "email": "pedro.abbud@usp.br",
+        },
+        "version": "0.1"
+    },
+
+"securityDefinitions":{
+    "Bearer":{
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+    }
+},
+    "host": "sharpener-cloud.appspot",
+    "schemes": [
+        "http",
+        "https"
+    ],
+}
 
 github_config = {
     "oauth_uri": settings.GITHUB_URI_OAUTH,
@@ -43,6 +69,13 @@ bucket_submissions = storage_client.bucket(settings.BUCKET_SUBMISSIONS)
 app = create_app(db_session, github_config, settings.FLASK_SECRET,
                  bucket_submissions, debug=is_development)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['JWT_AUTH_URL_RULE'] = '/authenticate'
+app.config['SWAGGER'] = {
+    'title': 'Sharpener APIDocs',
+    'uiversion': 3
+}
+app.config['JWT_AUTH_URL_RULE'] = '/api/auth'
+swagger = Swagger(app, template=template)
 
 if local:
     args = docopt(__doc__)
