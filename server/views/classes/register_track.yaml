@@ -1,0 +1,32 @@
+Associating a track with a class.
+Protected route, the user must be a Professor. Associates 
+a track in the specified class. The professor must be the owner 
+of the specified class.
+---
+security:
+  - cliToken: []
+headers:
+  - name: token
+    type: apiKey
+parameters:
+  - name: name
+    in: path
+    type: string
+    required: true
+    description: Class name
+  - name: track
+    in: path
+    type: string
+    required: true
+    description: Track name
+responses:
+  201:
+    description: Created.
+  401:
+    description: API Token error.
+  403:
+    description: Only teachers can register tracks.
+  404:
+    description: You don't own a class with this name.
+  409:
+    description: You already have a class with that name.

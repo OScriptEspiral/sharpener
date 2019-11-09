@@ -1,0 +1,21 @@
+Enrolling a student in a class by an invite token.
+Protected route. Enroll a student in the specified class by it's invite token.
+---
+security:
+  - cliToken: []
+headers:
+  - name: token
+    type: apiKey
+parameters:
+  - name: invite_token
+    in: path
+    type: string
+    required: true
+    description: An invite token of a class.
+responses:
+  200:
+    description: Already enrolled.
+  201:
+    description: Created.
+  401:
+    description: API Token error.

@@ -30,15 +30,14 @@ template = {
         },
         "version": "0.1"
     },
-
-"securityDefinitions":{
-    "Bearer":{
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header",
-    }
-},
-    "host": "sharpener-cloud.appspot",
+    "securityDefinitions": {
+        "cliToken": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+    "host": "sharpener-cloud.appspot" if is_production else "localhost:5000",
     "schemes": [
         "http",
         "https"

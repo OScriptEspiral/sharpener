@@ -9,3 +9,4 @@ tqdm
 uwsgi
 google-python-cloud-debugger
 flask-cors
+flasgger

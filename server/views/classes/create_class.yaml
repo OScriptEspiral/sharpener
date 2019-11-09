@@ -1,0 +1,21 @@
+Creating a class
+Protected route, the user must be a Professor. Create a class with 
+the specified name, unless the user already has a class with that name.
+---
+security:
+  - cliToken: []
+parameters:
+  - name: name
+    in: path
+    type: string
+    required: true
+    description: Class name
+responses:
+  201:
+    description: Created.
+  401:
+    description: API Token error.
+  403:
+    description: Only teachers can create classes.
+  409:
+    description: You already have a class with that name.

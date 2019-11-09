@@ -44,14 +44,15 @@ def extract_language(language):
     if not known_language:
         message = f"Unknown language {language}"
         return ValidationError(message, message, "language")
+    return known_language
 
 
 def extract_token(request):
-    bearer_token = request.headers.get('authorization')
-    if not bearer_token:
+    token = request.headers.get('authorization')
+    if not token:
         message = 'Authentication token header is missing'
         raise TokenError(message, message)
-    token = bearer_token.rsplit('Bearer ')[1]
+
     return token
 
 

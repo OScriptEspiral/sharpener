@@ -1,0 +1,47 @@
+Listing existing exercises
+Lists all existing exercises, sorted by difficulty.
+---
+parameters:
+  - name: page
+    in: query
+    required: false
+    type: integer
+    minimum: 0
+    default: 0
+    description: The number of pages to skip before starting to collect the result set.
+  - name: page_size
+    in: query
+    name: page_size
+    required: false
+    type: integer
+    minimum: 1
+    default: 25
+    description: The numbers of exercises to return.
+responses:
+  200:
+    description: A list of exercises
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: The exercise name.
+            example: Hello World
+          language:
+            type: string
+            description: The exercise language.
+            example: rust
+          topics:
+            type: array
+            items:
+              type: string
+              description: An exercise topic.
+              example: math
+          difficulty:
+            type: integer
+            description: How hard an exercise is.
+            min: 0 
+            max: 10
+            example: 0

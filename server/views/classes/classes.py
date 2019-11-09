@@ -19,7 +19,7 @@ def create_classes_blueprint(db_session, request):
 
     @classes.route('/', methods=['GET'])
     @handle_validation_error
-    @swag_from('classes_get.yaml')
+    @swag_from('get_all_classes.yaml')
     def get_all_classes():
         token = extract_token(request)
         user = extract_user(db_session, token)
@@ -38,9 +38,9 @@ def create_classes_blueprint(db_session, request):
 
         return jsonify(classes_data)
 
-    @classes.route('/<name>', methods=['POST'])
+    @classes.route('/<name>', methods=['PUT'])
     @handle_validation_error
-    @swag_from('classes_post.yaml')
+    @swag_from('create_class.yaml')
     def create_class(name):
         token = extract_token(request)
         user = extract_user(db_session, token)
@@ -69,8 +69,9 @@ def create_classes_blueprint(db_session, request):
 
         return Response(status=201)
 
-    @classes.route('/<name>/<track>', methods=['POST'])
+    @classes.route('/<name>/<track>', methods=['PUT'])
     @handle_validation_error
+    @swag_from('register_track.yaml')
     def register_track(name, track):
         token = extract_token(request)
         user = extract_user(db_session, token)

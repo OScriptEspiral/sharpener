@@ -1,0 +1,78 @@
+Retrieving a specific exercise filtered by language and name.
+Lists all existing exercises, sorted by difficulty, filtered by a language.
+---
+parameters:
+  - name: language
+    in: path
+    type: string
+    required: true
+    description: Programming language name
+    enum: ['rust', 'python']
+  - name: name
+    in: path
+    type: string
+    required: true
+    description: Exercise name
+  - name: page
+    in: query
+    required: false
+    type: integer
+    minimum: 0
+    default: 0
+    description: The number of pages to skip before starting to collect the result set.
+  - name: page_size
+    in: query
+    name: page_size
+    required: false
+    type: integer
+    minimum: 1
+    default: 25
+    description: The numbers of exercises to return.
+responses:
+  200:
+    description: Complete information about an exercise
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: The exercise name.
+            example: Hello World
+          language:
+            type: string
+            description: The exercise language.
+            example: rust
+          topics:
+            type: array
+            items:
+              type: string
+              description: An exercise topic.
+              example: math
+          difficulty:
+            type: integer
+            description: How hard an exercise is.
+            min: 0 
+            max: 10
+            example: 0
+          description:
+            type: string
+            description: The exercise description, typically written in Markdown (CommonMark).
+            example: \# Hello World \n The classical introductory exercise. Just say "Hello, World!".
+          solution:
+            type: string
+            description: Solution file URI
+            example: gs://bucket-exercises/accumulate/example.rs
+          starting_point:
+            description: Starting point file URI
+            example: gs://bucket-exercises/accumulate/src/lib.rs
+          compressed: 
+            description: Compressed file URI
+            example: gs://bucket-exercises/accumulate/accumulate.tar.gz
+          test: 
+            description: Test file URI
+            example: gs://bucket-exercises/accumulate/tests/accumulate.rs
+          hint:
+            description: Hint file URI
+            example: gs://bucket-exercises/accumulate/.meta/hints.md

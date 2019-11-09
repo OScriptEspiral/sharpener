@@ -1,10 +1,12 @@
 Listing enrolled or created classes 
-Protected route, that if the user is a professor, show all 
+Protected route, that if the user is a professor, shows all 
 classes that he/she created. If the user is a student, 
 all classes that the student is participating are returned.
 ---
 security:
-  - bearerAuth: []
+  - cliToken: []
+headers:
+  - name: token
 responses:
   200:
     description: A list of classes
@@ -31,3 +33,5 @@ responses:
             example: 2
   403:
     description: Only teachers can see classes.
+  401:
+    description: API Token error
