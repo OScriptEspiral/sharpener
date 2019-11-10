@@ -1,0 +1,23 @@
+Listing all exercises topics, filtered by language.
+Lists all existing topics filtered by language.
+---
+tags:
+  - Exercise
+  - Topic
+parameters:
+  - name: language
+    in: path
+    type: string
+    required: true
+    description: Programming language name
+    enum: ['rust', 'python']
+
+responses:
+  200:
+    description: A list of topics
+    schema:
+      type: array
+      items:
+        type: string
+        description: A topic
+        example: math

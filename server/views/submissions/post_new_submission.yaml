@@ -1,0 +1,40 @@
+Submitting a solution attempt to an exercise
+Protected route. Receives a solution attempt by receiving all necessary files.
+---
+tags:
+  - Submission
+security:
+  - cliToken: []
+
+parameters:
+  - name: submission_token
+    in: path
+    type: string
+    required: true
+    description: Submission token
+
+  - name: solution
+    required: true
+    in: formData
+    type: file
+
+  - name: test_coverage
+    required: true
+    in: formData
+    type: string
+
+  - name: test_output
+    required: true
+    in: formData
+    type: string
+
+  - name: test_checksum
+    required: true
+    in: formData
+    type: string
+
+responses:
+  201:
+    description: Submission details
+  401:
+    description: API Token error

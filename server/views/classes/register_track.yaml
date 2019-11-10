@@ -1,8 +1,11 @@
 Associating a track with a class.
-Protected route, the user must be a Professor. Associates 
-a track in the specified class. The professor must be the owner 
+Protected route, the user must be a Professor. Associates
+a track in the specified class. The professor must be the owner
 of the specified class.
 ---
+tags:
+  - Class
+  - Track
 security:
   - cliToken: []
 headers:

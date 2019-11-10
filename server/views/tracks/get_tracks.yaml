@@ -1,0 +1,43 @@
+Listing created tracks
+Protected route, the user must be a Professor. List all tracks
+created by the user.
+---
+tags:
+  - Track
+security:
+  - cliToken: []
+responses:
+  200:
+    description: A list of tracks
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: The track name.
+            example: An introduction to rust.
+          created_at:
+            type: string
+            description: Class creation timestamp.
+            format: date-time
+          exercises:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The exercise name.
+                  example: Hello World
+                language:
+                  type: string
+                  description: The exercise language.
+                  example: rust
+  401:
+    description: API Token error.
+  403:
+    description: Only teachers can create tracks.
+  409:
+    description: You already have a track with that name.

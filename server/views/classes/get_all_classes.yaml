@@ -3,6 +3,8 @@ Protected route, that if the user is a professor, shows all
 classes that he/she created. If the user is a student, 
 all classes that the student is participating are returned.
 ---
+tags:
+  - Class
 security:
   - cliToken: []
 headers:
@@ -19,6 +21,10 @@ responses:
             type: string
             description: The class name.
             example: Defence Against the Dark Arts
+          invite_token:
+            type: string
+            description: The token needed to access this class.
+            example: 08dbfa09-6697-4995-8914-ced857d09867
           created_at:
             type: string
             description: Class creation timestamp.

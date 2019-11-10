@@ -1,0 +1,58 @@
+Uploading or editing an exercise
+Upload a new exercise or edit an existing exercise. Only the creator
+of the exercise can edit it.
+---
+tags:
+  - Exercise
+parameters:
+  - name: language
+    in: path
+    type: string
+    required: true
+    description: Programming language name
+    enum: ['rust', 'python']
+  - name: name
+    in: path
+    type: string
+    required: true
+    description: Exercise name
+
+  - name: readme
+    required: true
+    in: formData
+    type: file
+
+  - name: solution
+    required: true
+    in: formData
+    type: file
+
+  - name: test
+    required: true
+    in: formData
+    type: file
+
+  - name: starting_point
+    required: true
+    in: formData
+    type: file
+
+  - name: compressed
+    required: true
+    in: formData
+    type: file
+
+  - name: meta
+    required: false
+    in: formData
+    type: file
+security:
+  - cliToken: []
+
+responses:
+  201:
+    description: Created.
+  400:
+    description: Unknown language || There are files missing:...
+  403:
+    description: Only teachers can use this method.

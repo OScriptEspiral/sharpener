@@ -1,77 +1,97 @@
-from flask import Blueprint, Response
-from werkzeug.utils import secure_filename
-from models import Submission, Attempt
-from server.utils import handle_validation_error
-from server.utils import (extract_token, extract_user, extract_submission)
-
-ALLOWED_EXTENSIONS = {'py', 'rs'}
-
-
-def upload_submission_files(bucket, blob_prefix, files):
-    blobs_uri = dict()
-    for (filename, file) in files.items():
-        blob_path = f"{blob_prefix}/{secure_filename(filename)}"
-        blob = bucket.blob(blob_path)
-        blob.upload_from_string(file.read(),
-                                content_type=file.content_type)
-        blobs_uri[filename] = f"gs://{bucket.name}/{blob_path}"
-    return blobs_uri
+from flasgger import swag_from
+from flask import Blueprint, Response, jsonify
+from models import Attempt, Submission, SubmissionStatus
+from server.utils import (extract_files, extract_submission,
+                          extract_test_params, extract_user,
+                          handle_validation_error, upload_files)
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def submission_to_dict(submission):
+    return {
+        "exercise_name": submission.exercise_name,
+        "exercise_language": submission.exercise_language.value,
+        "submission_token": submission.submission_token,
+        "attempts": len(submission.attempts),
+    }
 
 
-def create_new_submission(db_session, track_class_id, language,
-                          name, enrollment):
-    submission = Submission(
-        exercise_name=name,
-        exercise_language=language
-    )
+def create_new_submission(
+    db_session, track_class_id, language, name, enrollment
+):
+    submission = Submission(exercise_name=name, exercise_language=language)
     submission.enrollment = enrollment
     return submission
 
 
 def create_submissions_blueprint(db_session, request, bucket):
-    submissions = Blueprint('submissions', __name__)
+    submissions = Blueprint("submissions", __name__)
 
-    @submissions.route('/<submission_token>', methods=['POST'])
+    @submissions.route("/", methods=["GET"])
     @handle_validation_error
-    def post_new_submission(submission_token):
-        token = extract_token(request)
-        user = extract_user(db_session, token)
+    @swag_from("get_pending_submissions.yaml")
+    def get_pending_submissions():
+        user = extract_user(request, db_session)
+        submissions = (
+            db_session.query(Submission)
+            .filter_by(user=user.email, status=SubmissionStatus("pending"))
+            .all()
+        )
+        print(submissions)
+        data = [submission_to_dict(submission) for submission in submissions]
+        return jsonify(data)
+
+    @submissions.route("/<submission_token>", methods=["GET"])
+    @handle_validation_error
+    @swag_from("get_submission.yaml")
+    def get_submission(submission_token):
+        extract_user(request, db_session)
         submission = extract_submission(submission_token, db_session)
+        artifact = submission.exercise.artifact
 
-        expected_files = {'solution_file', 'test_coverage',
-                          'test_output', 'test_checksum'}
+        return {
+            "exercise_name": submission.exercise_name,
+            "exercise_language": submission.exercise_language.value,
+            "submission_token": submission_token,
+            "attempts": len(submission.attempts),
+            "submission_status": submission.status.value,
+            "download_uri": artifact.compressed,
+        }
 
-        received_files = {file for file in request.files
-                          if file in expected_files}
+    @submissions.route("/<submission_token>", methods=["POST"])
+    @handle_validation_error
+    @swag_from("post_new_submission.yaml")
+    def post_new_submission(submission_token):
+        user = extract_user(request, db_session)
+        submission = extract_submission(submission_token, db_session)
+        expected_files = {"solution"}
+        files = extract_files(request, expected_files)
+        coverage, output, checksum = extract_test_params(request)
+        print(coverage, output, checksum)
 
-        if not (received_files >= expected_files):
-            missing_files = ", ".join(expected_files - received_files)
-            return Response(f"There are files missing: {missing_files}",
-                            status=400)
+        attempt_number = len(submission.attempts)
+        blob_prefix_uri = (
+            f"{user.email}/{submission.exercise_language.name}/"
+            f"{submission.exercise_name}"
+            f"/{attempt_number}"
+        )
 
-        attempt_number = len(submission.attempts) + 1
-        blob_prefix_uri = (f"{user.email}/{submission.exercise_language.name}/"
-                           f"{submission.exercise_name}"
-                           f"/{attempt_number}")
-        uploaded_blobs = upload_submission_files(bucket, blob_prefix_uri,
-                                                 request.files)
+        mapper = submission.exercise_language.get_mapper()
+        files_map = mapper(blob_prefix_uri, submission.exercise_name)
+
+        uploaded_blobs = upload_files(bucket, files, files_map)
 
         attempt = Attempt(
-            solution_file=uploaded_blobs["solution_file"],
-            test_coverage=uploaded_blobs["test_coverage"],
-            test_output=uploaded_blobs["test_output"],
-            test_checksum=uploaded_blobs["test_checksum"],
-            attempt_number=attempt_number
+            solution_file=uploaded_blobs["solution"],
+            test_coverage=coverage,
+            test_output=output,
+            test_checksum=checksum,
+            attempt_number=attempt_number + 1,
         )
 
         submission.attempts.append(attempt)
         db_session.add(submission, attempt)
         db_session.commit()
 
-        return Response('Exercise solution submited', status=201)
+        return Response("Exercise solution submited", status=201)
+
     return submissions

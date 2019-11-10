@@ -1,0 +1,35 @@
+Listing all pending submissions.
+Protected route, that lists all user's pending submissions.
+---
+tags:
+  - Submission
+security:
+  - cliToken: []
+
+responses:
+  200:
+    description: A list of submissions
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          exercise_name:
+            type: string
+            description: Exercise name.
+            example: Hello World
+          exercise_language:
+            type: string
+            description: Exercise language.
+            example: python
+          attempts:
+            type: integer
+            description: Number of attempts submitted.
+            example: 42
+          submission_token:
+            type: string
+            description: Submission token of this exercise.
+            example: 903a930a-c206-4b31-9c38-7e306ed4f2fd
+
+  401:
+    description: API Token error

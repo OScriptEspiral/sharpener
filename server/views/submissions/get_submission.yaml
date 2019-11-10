@@ -1,0 +1,45 @@
+Getting details about a submission
+Protected route, exposes details about a submission.
+---
+tags:
+  - Submission
+security:
+  - cliToken: []
+
+parameters:
+  - name: submission_token
+    in: path
+    type: string
+    required: true
+    description: Submission token
+
+responses:
+  200:
+    description: Submission details
+    schema:
+      type: object
+      properties:
+        exercise_name:
+          type: string
+          description: Exercise name.
+          example: Hello World
+        exercise_language:
+          type: string
+          description: Exercise language.
+          example: python
+        attempts:
+          type: integer
+          description: Number of attempts submitted.
+          example: 42
+        submission_token:
+          type: string
+          description: Submission token of this exercise.
+          example: 903a930a-c206-4b31-9c38-7e306ed4f2fd
+        download_url:
+          type: string
+          description: The URL to download the compressed file containing the exercise.
+          example: https://some.cloud/some/uri/rust/hello-world/hello-world.tar.gz
+
+
+  401:
+    description: API Token error

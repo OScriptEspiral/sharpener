@@ -1,6 +1,9 @@
 Enrolling a student in a class by an invite token.
 Protected route. Enroll a student in the specified class by it's invite token.
 ---
+tags:
+  - Class
+  - Enrollment
 security:
   - cliToken: []
 headers:

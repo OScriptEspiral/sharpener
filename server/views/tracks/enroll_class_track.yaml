@@ -1,0 +1,33 @@
+Enroll all students in a track registered in a class.
+Protected route, the user must be a Professor. Enroll all students
+that are registered in a class, in that track. Submissions from each
+equivalent exercise group will be generated.
+The professor must be the owner of the specified class.
+---
+tags:
+  - Class
+  - Track
+  - Submission
+security:
+  - cliToken: []
+
+parameters:
+  - name: track_name
+    in: path
+    type: string
+    required: true
+    description: Track name
+  - name: class_name
+    in: path
+    type: string
+    required: true
+    description: Class name
+responses:
+  201:
+    description: Created.
+  401:
+    description: API Token error.
+  403:
+    description: Only teachers can enroll students in classes tracks.
+  404:
+    description: You don't own a class with this name.

@@ -1,6 +1,8 @@
 Listing existing exercises filtered by language.
 Lists all existing exercises, sorted by difficulty, filtered by a language.
 ---
+tags:
+  - Exercise
 parameters:
   - name: language
     in: path

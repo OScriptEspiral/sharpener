@@ -1,6 +1,7 @@
-from flask import Blueprint, Response
-from models import Track, TrackClassAssociation, Enrollment
-from server.utils import (extract_token, extract_user, extract_class,
+from flasgger import swag_from
+from flask import Blueprint, Response, jsonify
+from models import Enrollment, Track, TrackClassAssociation
+from server.utils import (extract_class, extract_exercises, extract_teacher,
                           extract_track, handle_validation_error)
 
 
@@ -18,47 +19,70 @@ def create_track_class(existing_class, existing_track):
 def get_new_enrollments(track_class, db_session):
     existing_class = track_class.class_ref
     students = existing_class.students
-    already_enrolled,  = pluck_first_column(
+    already_enrolled = pluck_first_column(
         db_session.query(Enrollment)
         .filter_by(track_class_id=track_class.id)
         .with_entities(Enrollment.user)
         .all()
     )
 
-    enrollments = [Enrollment(user=student.email,
-                              track_class_id=track_class.id)
-                   for student in students
-                   if student.email not in already_enrolled]
+    enrollments = [
+        Enrollment(user=student.email, track_class_id=track_class.id)
+        for student in students
+        if student.email not in already_enrolled
+    ]
     return enrollments
 
 
+def exercise_to_dict(exercise):
+    return {"name": exercise.name, "language": exercise.language.value}
+
+
+def track_to_dict(track):
+    return {
+        "name": track.name,
+        "exercises": [
+            exercise_to_dict(exercise) for exercise in track.exercises
+        ],
+        "created_at": track.created_at,
+    }
+
+
 def create_tracks_blueprint(db_session, request):
-    tracks = Blueprint('tracks', __name__)
+    tracks = Blueprint("tracks", __name__)
 
-    @tracks.route('/<track_name>', methods=['POST'])
+    @tracks.route("/", methods=["GET"])
     @handle_validation_error
+    @swag_from("get_tracks.yaml")
+    def get_tracks():
+        teacher = extract_teacher(request, db_session)
+        existing_tracks = (
+            db_session.query(Track).filter_by(owner=teacher.email).all()
+        )
+        data = [track_to_dict(track) for track in existing_tracks]
+
+        return jsonify(data)
+
+    @tracks.route("/<track_name>", methods=["PUT"])
+    @handle_validation_error
+    @swag_from("create_track.yaml")
     def create_track(track_name):
-        token = extract_token(request)
-        user = extract_user(db_session, token)
+        teacher = extract_teacher(request, db_session)
 
-        if not user.is_teacher:
-            return Response(response="Only teachers can create tracks.",
-                            status=403)
-
-        existing_track = db_session.query(Track)\
-            .filter_by(owner=user.email, name=track_name)\
+        existing_track = (
+            db_session.query(Track)
+            .filter_by(owner=teacher.email, name=track_name)
             .first()
+        )
 
         if existing_track:
-            return Response(
-                response="You already have a track with that track_name.",
-                status=409
-            )
+            message = "You already have a track with that track_name."
+            return Response(response=message, status=409)
 
         new_track = Track(name=track_name)
 
-        user.tracks_owned.append(new_track)
-        db_session.add(user)
+        teacher.tracks_owned.append(new_track)
+        db_session.add(teacher)
         db_session.flush()
         db_session.add(new_track)
 
@@ -66,23 +90,24 @@ def create_tracks_blueprint(db_session, request):
 
         return Response(status=201)
 
-    @tracks.route('/<track_name>/classes/<class_name>', methods=['POST'])
+    @tracks.route("/<track_name>/classes/<class_name>", methods=["POST"])
     @handle_validation_error
+    @swag_from("enroll_class_track.yaml")
     def enroll_class_track(track_name, class_name):
-        token = extract_token(request)
-        user = extract_user(db_session, token)
-        if not user.is_teacher:
-            return Response(response="Only teachers can enroll classes in tracks.",
-                            status=403)
+        teacher = extract_teacher(request, db_session)
+        existing_class = extract_class(class_name, db_session, teacher)
+        existing_track = extract_track(track_name, db_session, teacher)
 
-        existing_class = extract_class(class_name, db_session, user)
-        existing_track = extract_track(track_name, db_session, user)
-        existing_track_class = db_session.query(TrackClassAssociation)\
-            .filter_by(class_ref=existing_class, track=existing_track)\
+        existing_track_class = (
+            db_session.query(TrackClassAssociation)
+            .filter_by(class_ref=existing_class, track=existing_track)
             .first()
+        )
+
         if not existing_track_class:
-            existing_track_class = create_track_class(existing_class,
-                                                      existing_track)
+            existing_track_class = create_track_class(
+                existing_class, existing_track
+            )
             db_session.add(existing_track_class)
             db_session.flush()
 
@@ -93,5 +118,18 @@ def create_tracks_blueprint(db_session, request):
         db_session.merge(existing_track_class)
         db_session.commit()
         return Response(status=201)
+
+    # @tracks.route("/<track_name>/exercises", methods=["POST"])
+    # @handle_validation_error
+    # @swag_from("register_track_exercises.yaml")
+    # def register_track_exercise(track_name):
+    #     teacher = extract_teacher(request, db_session)
+    #     track = extract_track(track_name, db_session, teacher)
+    #     exercises = extract_exercises(request, db_session)
+    #     track.exercises.append(exercises)
+    #     db_session.add(track)
+    #     db_session.commit()
+
+    #     return Response(status=201)
 
     return tracks

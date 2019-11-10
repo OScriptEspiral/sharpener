@@ -1,6 +1,8 @@
 Listing existing exercises
 Lists all existing exercises, sorted by difficulty.
 ---
+tags:
+  - Exercise
 parameters:
   - name: page
     in: query

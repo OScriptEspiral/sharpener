@@ -1,8 +1,7 @@
 from flask import Blueprint, Response
 from models import UserClassAssociation
 from flasgger import swag_from
-from server.utils import (extract_token, extract_user,
-                          extract_class_from_token, handle_validation_error)
+from server.utils import (extract_user, extract_class_from_token, handle_validation_error)
 
 
 def create_enrollments_blueprint(db_session, request):
@@ -12,8 +11,7 @@ def create_enrollments_blueprint(db_session, request):
     @handle_validation_error
     @swag_from('enroll_user_in_class.yaml')
     def enroll_user_in_class(invite_token):
-        token = extract_token(request)
-        user = extract_user(db_session, token)
+        user = extract_user(request, db_session)
         existing_class = extract_class_from_token(invite_token, db_session)
 
         existing_class_user = db_session.query(UserClassAssociation)\
