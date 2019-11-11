@@ -178,15 +178,19 @@ def extract_test_params(request):
 
 
 def extract_exercises(request, db_session):
-    data = request.get_json(silent=True, force=True)
-    exercises = data.get("exercises")
+    exercises = request.get_json(silent=True, force=True)
     try:
         extracted_exercises = [
-            db_session(Exercise)
-            .filter_by(name=ex.get("name"), language=ex.get("language"))
-            .first()
+            (
+                db_session.query(Exercise)
+                .filter_by(name=ex.get("name"), language=ex.get("language"))
+                .first(),
+                ex.get("step"),
+            )
             for ex in exercises
         ]
+        print(extracted_exercises)
+
     except Exception:
         message = "Invalid exercises data"
         raise ValidationError(message, message, "exercises")

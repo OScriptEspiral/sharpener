@@ -1,0 +1,44 @@
+Adding exercises to a track
+Protected route, the user must be a Professor.
+Add exercises to an existing track.
+---
+tags:
+  - Track
+  - Exercise
+parameters:
+  - name: track_name
+    in: path
+    type: string
+    required: true
+    description: Track name
+
+  - name: exercises
+    in: body
+    required: true
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: The exercise name.
+            example: Hello World
+          language:
+            type: string
+            description: The exercise language.
+            example: rust
+          step:
+            type: integer
+            description: The equivalent group exercise number
+            example: 2
+
+security:
+  - cliToken: []
+responses:
+  201:
+    description: Exercises added.
+  401:
+    description: API Token error.
+  403:
+    description: Only teachers can add exercises.

@@ -1,6 +1,8 @@
 from flasgger import swag_from
 from flask import Blueprint, Response, jsonify
-from models import Enrollment, Track, TrackClassAssociation
+
+from models import (Enrollment, Track, TrackClassAssociation,
+                    TrackExerciseAssociation)
 from server.utils import (extract_class, extract_exercises, extract_teacher,
                           extract_track, handle_validation_error)
 
@@ -119,17 +121,38 @@ def create_tracks_blueprint(db_session, request):
         db_session.commit()
         return Response(status=201)
 
-    # @tracks.route("/<track_name>/exercises", methods=["POST"])
-    # @handle_validation_error
-    # @swag_from("register_track_exercises.yaml")
-    # def register_track_exercise(track_name):
-    #     teacher = extract_teacher(request, db_session)
-    #     track = extract_track(track_name, db_session, teacher)
-    #     exercises = extract_exercises(request, db_session)
-    #     track.exercises.append(exercises)
-    #     db_session.add(track)
-    #     db_session.commit()
+    @tracks.route("/<track_name>/exercises", methods=["POST"])
+    @handle_validation_error
+    @swag_from("register_track_exercises.yaml")
+    def register_track_exercise(track_name):
+        teacher = extract_teacher(request, db_session)
+        track = extract_track(track_name, db_session, teacher)
+        exercises = extract_exercises(request, db_session)
+        new_track_exercises = []
+        for (ex, step) in exercises:
+            existing_track_exercise = (
+                db_session.query(TrackExerciseAssociation)
+                .filter_by(
+                    track_name=track.name,
+                    track_owner=track.owner,
+                    exercise_name=ex.name,
+                    exercise_language=ex.language,
+                )
+                .first()
+            )
+            if not existing_track_exercise:
+                new_association = TrackExerciseAssociation(
+                    track_name=track.name,
+                    track_owner=track.owner,
+                    exercise_name=ex.name,
+                    exercise_language=ex.language,
+                    step=step,
+                )
+                new_track_exercises.append(new_association)
 
-    #     return Response(status=201)
+        db_session.add_all(new_track_exercises)
+        db_session.commit()
+
+        return Response(status=201)
 
     return tracks
