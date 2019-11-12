@@ -33,7 +33,7 @@ template = {
     "securityDefinitions": {
         "cliToken": {"type": "apiKey", "name": "Authorization", "in": "header"}
     },
-    "host": "sharpener-cloud.appspot" if is_production else "localhost:5000",
+    "host": "sharpener-cloud.appspot.com" if is_production else "localhost:5000",
     "schemes": ["http", "https"],
 }
 

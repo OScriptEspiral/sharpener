@@ -4,6 +4,7 @@ on:
     branches: 
     - "master"
     - "submission"
+    - "apidocs"
 jobs:
   lint:
     runs-on: ubuntu-latest
